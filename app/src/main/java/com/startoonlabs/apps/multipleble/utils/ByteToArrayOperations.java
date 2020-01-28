@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleemg.utils;
+package com.startoonlabs.apps.multipleble.utils;
 
 /**
  * Main class with the packet structure emg

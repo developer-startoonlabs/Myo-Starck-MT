@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleemg;
+package com.startoonlabs.apps.multipleble;
 
 import android.app.Application;
 import android.app.NotificationChannel;

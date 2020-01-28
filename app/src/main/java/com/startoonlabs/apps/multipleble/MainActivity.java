@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleemg;
+package com.startoonlabs.apps.multipleble;
 
 import android.Manifest;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService;
+import com.startoonlabs.apps.multipleble.services.PheezeeBleService;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;

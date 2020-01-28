@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleemg.adapter;
+package com.startoonlabs.apps.multipleble.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,8 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.startoonlabs.apps.multiplebleemg.R;
-import com.startoonlabs.apps.multiplebleemg.classes.DeviceListClass;
+import com.startoonlabs.apps.multipleble.R;
+import com.startoonlabs.apps.multipleble.classes.DeviceListClass;
 
 import java.util.ArrayList;
 

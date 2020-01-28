@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleemg.ui.home;
+package com.startoonlabs.apps.multipleble.ui.home;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -38,21 +38,21 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.startoonlabs.apps.multiplebleemg.R;
-import com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService;
+import com.startoonlabs.apps.multipleble.R;
+import com.startoonlabs.apps.multipleble.services.PheezeeBleService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static android.content.Context.BIND_AUTO_CREATE;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.bluetooth_state;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.device_mac_1;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.device_mac_2;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.device_state_1;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.device_state_2;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.session_data_1;
-import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.session_data_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.bluetooth_state;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_1;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_1;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_1;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_2;
 
 public class HomeFragment extends Fragment {
     private static final int REQUEST_FINE_LOCATION = 14;
