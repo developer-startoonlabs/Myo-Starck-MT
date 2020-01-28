@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Multiple Ble</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Scan Devices</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="connected">Connected</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="emg_unit">μV</string>
+</resources>
