@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.services;
+package com.startoonlabs.apps.multiplebleemg.services;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;

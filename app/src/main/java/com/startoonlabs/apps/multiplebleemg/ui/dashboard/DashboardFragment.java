@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.ui.dashboard;
+package com.startoonlabs.apps.multiplebleemg.ui.dashboard;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -32,21 +32,21 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.startoonlabs.apps.multiplebleEmg.R;
-import com.startoonlabs.apps.multiplebleEmg.adapter.DeviceListArrayAdapter;
-import com.startoonlabs.apps.multiplebleEmg.classes.DeviceListClass;
-import com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService;
-import com.startoonlabs.apps.multiplebleEmg.utils.RegexOperations;
+import com.startoonlabs.apps.multiplebleemg.R;
+import com.startoonlabs.apps.multiplebleemg.adapter.DeviceListArrayAdapter;
+import com.startoonlabs.apps.multiplebleemg.classes.DeviceListClass;
+import com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService;
+import com.startoonlabs.apps.multiplebleemg.utils.RegexOperations;
 
 import java.util.ArrayList;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 import static android.content.Context.BLUETOOTH_SERVICE;
-import static com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService.bluetooth_state;
-import static com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService.device_state;
-import static com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService.scan_state;
-import static com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService.scan_too_frequent;
-import static com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService.scanned_list;
+import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.bluetooth_state;
+import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.device_state;
+import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.scan_state;
+import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.scan_too_frequent;
+import static com.startoonlabs.apps.multiplebleemg.services.PheezeeBleService.scanned_list;
 
 public class DashboardFragment extends Fragment {
 

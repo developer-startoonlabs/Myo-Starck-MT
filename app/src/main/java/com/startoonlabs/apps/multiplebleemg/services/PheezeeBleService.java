@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.services;
+package com.startoonlabs.apps.multiplebleemg.services;
 
 import android.app.Notification;
 import android.app.Service;
@@ -34,11 +34,11 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
-import com.startoonlabs.apps.multiplebleEmg.R;
-import com.startoonlabs.apps.multiplebleEmg.classes.DeviceListClass;
-import com.startoonlabs.apps.multiplebleEmg.model.PheezeeDevicesGattListModel;
-import com.startoonlabs.apps.multiplebleEmg.model.PheezeeServicesListModel;
-import com.startoonlabs.apps.multiplebleEmg.utils.ByteToArrayOperations;
+import com.startoonlabs.apps.multiplebleemg.R;
+import com.startoonlabs.apps.multiplebleemg.classes.DeviceListClass;
+import com.startoonlabs.apps.multiplebleemg.model.PheezeeDevicesGattListModel;
+import com.startoonlabs.apps.multiplebleemg.model.PheezeeServicesListModel;
+import com.startoonlabs.apps.multiplebleemg.utils.ByteToArrayOperations;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.startoonlabs.apps.multiplebleEmg.App.CHANNEL_ID;
+import static com.startoonlabs.apps.multiplebleemg.App.CHANNEL_ID;
 
 public class PheezeeBleService extends Service {
     private byte[] temp_info_packet = null;

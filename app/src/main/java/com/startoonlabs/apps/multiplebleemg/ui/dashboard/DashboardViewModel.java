@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.ui.dashboard;
+package com.startoonlabs.apps.multiplebleemg.ui.dashboard;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

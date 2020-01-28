@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.classes;
+package com.startoonlabs.apps.multiplebleemg.classes;
 
 public class DeviceListClass {
     String deviceName, deviceMacAddress, deviceBondState, deviceRssi;

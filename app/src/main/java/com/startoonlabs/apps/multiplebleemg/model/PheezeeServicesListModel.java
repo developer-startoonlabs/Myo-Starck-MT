@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.model;
+package com.startoonlabs.apps.multiplebleemg.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;

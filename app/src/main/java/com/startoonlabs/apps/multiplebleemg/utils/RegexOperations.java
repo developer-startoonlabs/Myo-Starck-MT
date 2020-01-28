@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.utils;
+package com.startoonlabs.apps.multiplebleemg.utils;
 
 import android.util.Patterns;
 

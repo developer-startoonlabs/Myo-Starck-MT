@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multiplebleEmg.ui.home;
+package com.startoonlabs.apps.multiplebleemg.ui.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
