@@ -79,7 +79,6 @@ public class DashboardFragment extends Fragment {
         });
         checkPermissionsRequired();
         checkLocationEnabled();
-        startBluetoothService();
 
         lv_scandevices =root.findViewById(R.id.lv_deviceList);
         swipeRefreshLayout = root.findViewById(R.id.scandevices_swiperefresh);
@@ -156,10 +155,6 @@ public class DashboardFragment extends Fragment {
         hasPermissions();
     }
 
-
-    private void startBluetoothService() {
-        ContextCompat.startForegroundService(getActivity(),new Intent(getActivity(), PheezeeBleService.class));
-    }
 
     private boolean checkLocationEnabled(){
         LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);

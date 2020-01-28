@@ -87,7 +87,6 @@ public class HomeFragment extends Fragment {
         });
         checkPermissionsRequired();
         checkLocationEnabled();
-        startBluetoothService();
 
 
         tv_first_device_state = root.findViewById(R.id.tv_device_status_1);
@@ -275,10 +274,6 @@ public class HomeFragment extends Fragment {
         ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION);
     }
 
-
-    private void startBluetoothService() {
-        ContextCompat.startForegroundService(getActivity(),new Intent(getActivity(), PheezeeBleService.class));
-    }
 
     private boolean checkLocationEnabled(){
         LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
