@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multipleble;
+package com.startoonlabs.apps.multiplebleEmg;
 
 import android.Manifest;
 import android.content.Context;
@@ -8,20 +8,14 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.startoonlabs.apps.multipleble.services.PheezeeBleService;
-import com.startoonlabs.apps.multipleble.ui.dashboard.DashboardFragment;
-import com.startoonlabs.apps.multipleble.ui.home.HomeFragment;
+import com.startoonlabs.apps.multiplebleEmg.services.PheezeeBleService;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;

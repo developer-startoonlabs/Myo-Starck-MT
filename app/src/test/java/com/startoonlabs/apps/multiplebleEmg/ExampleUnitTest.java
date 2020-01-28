@@ -1,4 +1,4 @@
-package com.startoonlabs.apps.multipleble;
+package com.startoonlabs.apps.multiplebleEmg;
 
 import org.junit.Test;
 
