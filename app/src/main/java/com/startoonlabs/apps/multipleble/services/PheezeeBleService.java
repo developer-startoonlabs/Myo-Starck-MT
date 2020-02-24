@@ -65,36 +65,54 @@ public class PheezeeBleService extends Service {
 
     boolean isConnectCommandGiven = false;
     //Intent Actions
-    public static String device_state = "device.state";
-    public static String device_state_1 = "device.state.1";
-    public static String device_state_2 = "device.state.2";
-    public static String device_mac_1 = "device.mac.1";
-    public static String device_mac_2 = "device.mac.2";
-    public static String bluetooth_state = "ble.state";
-    public static String battery_percent = "battery.percent";
-    public static String usb_state = "usb.state";
-    public static String firmware_version = "firmware.version";
-    public static String atiny_version = "atiny.version";
-    public static String manufacturer_name = "manufacturer.name";
-    public static String hardware_version = "hardware.version";
-    public static String serial_id = "serial.id";
-    public static String scanned_list = "scanned.list";
-    public static String session_data = "session.data";
-    public static String session_data_1 = "session.data.1";
-    public static String session_data_2 = "session.data.2";
-    public static String scan_state = "scan.state";
-    public static String scan_too_frequent = "scan.too.frequent";
-    public static String firmware_log = "firmware.log";
-    public static String health_status = "health.status";
-    public static String location_status = "location.status";
-    public static String device_details_status = "device.details.status";
-    public static String device_details_email = "device.details.email";
-    public static String dfu_start_initiated = "dfu.start.initiated";
-    public static String df_characteristic_written = "dfu.characteristic.written";
-    public static String firmware_update_available = "firmware.update.available";
-    public static String device_disconnected_firmware = "device.disconnected.firmware";
-    public static String scedule_device_status_service = "scedule.device.status.service";
-    public static String deactivate_device = "deactivate.device";
+    public static String device_state = "emg.device.state";
+    public static String device_state_1 = "emg.device.state.1";
+    public static String device_state_2 = "emg.device.state.2";
+    public static String device_state_3 = "emg.device.state.3";
+    public static String device_state_4 = "emg.device.state.4";
+    public static String device_state_5 = "emg.device.state.5";
+    public static String device_state_6 = "emg.device.state.6";
+
+
+    public static String device_mac_1 = "emg.device.mac.1";
+    public static String device_mac_2 = "emg.device.mac.2";
+    public static String device_mac_3 = "emg.device.mac.3";
+    public static String device_mac_4 = "emg.device.mac.4";
+    public static String device_mac_5 = "emg.device.mac.5";
+    public static String device_mac_6 = "emg.device.mac.6";
+
+    public static String session_data_1 = "emg.session.data.1";
+    public static String session_data_2 = "emg.session.data.2";
+    public static String session_data_3 = "emg.session.data.3";
+    public static String session_data_4 = "emg.session.data.4";
+    public static String session_data_5 = "emg.session.data.5";
+    public static String session_data_6 = "emg.session.data.6";
+
+
+    public static String bluetooth_state = "emg.ble.state";
+    public static String battery_percent = "emg.battery.percent";
+    public static String usb_state = "emg.usb.state";
+    public static String firmware_version = "emg.firmware.version";
+    public static String atiny_version = "emg.atiny.version";
+    public static String manufacturer_name = "emg.manufacturer.name";
+    public static String hardware_version = "emg.hardware.version";
+    public static String serial_id = "emg.serial.id";
+    public static String scanned_list = "emg.scanned.list";
+    public static String session_data = "emg.session.data";
+
+    public static String scan_state = "emg.scan.state";
+    public static String scan_too_frequent = "emg.scan.too.frequent";
+    public static String firmware_log = "emg.firmware.log";
+    public static String health_status = "emg.health.status";
+    public static String location_status = "emg.location.status";
+    public static String device_details_status = "emg.device.details.status";
+    public static String device_details_email = "emg.device.details.email";
+    public static String dfu_start_initiated = "emg.dfu.start.initiated";
+    public static String df_characteristic_written = "emg.dfu.characteristic.written";
+    public static String firmware_update_available = "emg.firmware.update.available";
+    public static String device_disconnected_firmware = "emg.device.disconnected.firmware";
+    public static String scedule_device_status_service = "emg.scedule.device.status.service";
+    public static String deactivate_device = "emg.deactivate.device";
 
 
     public static int jobid_firmware_log = 0;
@@ -145,7 +163,9 @@ public class PheezeeBleService extends Service {
     //Characteristic read list
     ArrayList<BluetoothGattCharacteristic> mCharacteristicReadList;
 
-    private Boolean mDeviceState = false, mBluetoothState = false, mUsbState = false,mDeviceState1 = false, mDeviceState2 = false;
+    private Boolean mDeviceState = false, mBluetoothState = false, mUsbState = false,
+            mDeviceState1 = false, mDeviceState2 = false, mDeviceState3 = false, mDeviceState4 = false
+            ,mDeviceState5 = false, mDeviceState6 = false;
     private int mBatteryPercent = 0;
     private String mFirmwareVersion = "", mSerialId = "", mManufacturerName = "", mAtinyVersion = "", mHardwareVersion="";
     private boolean mScanning = false;
@@ -350,6 +370,34 @@ public class PheezeeBleService extends Service {
         sendBroadcast(i);
     }
 
+    public void deviceStateBroadcastThird(){
+        Intent i = new Intent(device_state_3);
+        i.putExtra(device_state_3,mDeviceState3);
+
+        sendBroadcast(i);
+    }
+
+    public void deviceStateBroadcastFourth(){
+        Intent i = new Intent(device_state_4);
+        i.putExtra(device_state_4,mDeviceState4);
+
+        sendBroadcast(i);
+    }
+
+    public void deviceStateBroadcastFifth(){
+        Intent i = new Intent(device_state_5);
+        i.putExtra(device_state_5,mDeviceState5);
+
+        sendBroadcast(i);
+    }
+
+    public void deviceStateBroadcastSixth(){
+        Intent i = new Intent(device_state_6);
+        i.putExtra(device_state_6,mDeviceState6);
+
+        sendBroadcast(i);
+    }
+
     public void deviceMacBroadcastFirst(){
         if(mDeviceState1 && gattList.size()>0) {
             Intent i = new Intent(device_mac_1);
@@ -363,6 +411,38 @@ public class PheezeeBleService extends Service {
         if(mDeviceState2 && gattList.size()>1) {
             Intent i = new Intent(device_mac_2);
             i.putExtra(device_mac_2, gattList.get(1).getmBluetoothGatt().getDevice().getAddress());
+            sendBroadcast(i);
+        }
+    }
+
+    public void deviceMacBradcastThird(){
+        if(mDeviceState2 && gattList.size()>2) {
+            Intent i = new Intent(device_mac_3);
+            i.putExtra(device_mac_3, gattList.get(2).getmBluetoothGatt().getDevice().getAddress());
+            sendBroadcast(i);
+        }
+    }
+
+    public void deviceMacBradcastFourth(){
+        if(mDeviceState2 && gattList.size()>3) {
+            Intent i = new Intent(device_mac_4);
+            i.putExtra(device_mac_4, gattList.get(3).getmBluetoothGatt().getDevice().getAddress());
+            sendBroadcast(i);
+        }
+    }
+
+    public void deviceMacBradcastFifth(){
+        if(mDeviceState2 && gattList.size()>4) {
+            Intent i = new Intent(device_mac_5);
+            i.putExtra(device_mac_5, gattList.get(4).getmBluetoothGatt().getDevice().getAddress());
+            sendBroadcast(i);
+        }
+    }
+
+    public void deviceMacBradcastSixth(){
+        if(mDeviceState2 && gattList.size()>5) {
+            Intent i = new Intent(device_mac_6);
+            i.putExtra(device_mac_6, gattList.get(5).getmBluetoothGatt().getDevice().getAddress());
             sendBroadcast(i);
         }
     }
@@ -528,6 +608,14 @@ public class PheezeeBleService extends Service {
     }
 
     public void connectDevice(String deviceMacc){
+        if(gattList.size()>0){
+            for (int i=0;i<gattList.size();i++){
+                if(gattList.get(i).getmBluetoothGatt().getDevice().getAddress().equalsIgnoreCase(deviceMacc) && gattList.get(i).getDeviceStatus()){
+                    Toast.makeText(this, "Device already connected!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
             final BluetoothManager mbluetoothManager=(BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             bluetoothAdapter = mbluetoothManager.getAdapter();
             final BluetoothDevice remoteDevice = bluetoothAdapter.getRemoteDevice(deviceMacc);
@@ -542,6 +630,7 @@ public class PheezeeBleService extends Service {
                         if(gattList.get(i).getDeviceStatus()==false){
                             gattList.set(i,listModel);
                             flag = true;
+                            break;
                         }
                     }
                     if(!flag){
@@ -679,8 +768,16 @@ public class PheezeeBleService extends Service {
         Log.i("HERE","HEREGETDETAILS");
         deviceStateBroadcastFirst();
         deviceStateBroadcastSecond();
+        deviceStateBroadcastThird();
+        deviceStateBroadcastFourth();
+        deviceStateBroadcastFifth();
+        deviceStateBroadcastSixth();
         deviceMacBroadcastFirst();
         deviceMacBradcastSecond();
+        deviceMacBradcastThird();
+        deviceMacBradcastFourth();
+        deviceMacBradcastFifth();
+        deviceMacBradcastSixth();
     }
 
 
@@ -741,6 +838,43 @@ public class PheezeeBleService extends Service {
     }
 
 
+    public void startAllNotification(){
+        if(gattList.size()==0){
+            Toast.makeText(this, "No Device Connected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (int i=0;i<gattList.size();i++){
+            if(gattList.get(i).getDeviceStatus()){
+                if(gattList.get(i).getmServicesList().getmCustomCharacteristic()!=null && gattList.get(i).getmBluetoothGatt()!=null){
+                    gattList.get(i).getmBluetoothGatt().setCharacteristicNotification(gattList.get(i).getmServicesList().getmCustomCharacteristic(),true);
+                    gattList.get(i).getmServicesList().getmCustomCharacteristicDescriptor().setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    gattList.get(i).getmBluetoothGatt().writeDescriptor(gattList.get(i).getmServicesList().getmCustomCharacteristicDescriptor());
+                }
+            }else {
+                Toast.makeText(this, "Device Not Connected", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void stopAlNotification(){
+        if(gattList.size()==0){
+            Toast.makeText(this, "No Device Connected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (int i=0;i<gattList.size();i++){
+            if(gattList.get(i).getDeviceStatus()){
+                if(gattList.get(i).getmServicesList().getmCustomCharacteristic()!=null && gattList.get(i).getmBluetoothGatt()!=null){
+                    gattList.get(i).getmBluetoothGatt().setCharacteristicNotification(gattList.get(i).getmServicesList().getmCustomCharacteristic(),false);
+                    gattList.get(i).getmServicesList().getmCustomCharacteristicDescriptor().setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+                    gattList.get(i).getmBluetoothGatt().writeDescriptor(gattList.get(i).getmServicesList().getmCustomCharacteristicDescriptor());
+                }
+            }else {
+                Toast.makeText(this, "Device Not Connected", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
 
     public BluetoothGattCallback callback = new BluetoothGattCallback() {
         @Override
@@ -754,26 +888,55 @@ public class PheezeeBleService extends Service {
                     deviceStateBroadcast();
                     num_of_device_connected++;
                     showNotification(device_connected_notif+"("+num_of_device_connected+")");
-                    if(gattList.size()>1){
+                    if(gattList.size()>0){
                         if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
                             mDeviceState1 = true;
                             gattList.get(0).setDeviceStatus(true);
                             Log.i("FIRST DEVICE","FIRST DEVICE");
-                            deviceStateBroadcastFirst();
                             deviceMacBroadcastFirst();
-                        }else {
+                            deviceStateBroadcastFirst();
+                        }
+                    }if(gattList.size()>1){
+                        if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()) {
                             Log.i("SECOND DEVICE","SECOND DEVICE");
                             mDeviceState2 = true;
                             gattList.get(1).setDeviceStatus(true);
-                            deviceStateBroadcastSecond();
                             deviceMacBradcastSecond();
+                            deviceStateBroadcastSecond();
                         }
-                    }else {
-                        mDeviceState1 = true;
-                        gattList.get(0).setDeviceStatus(true);
-                        Log.i("FIRST DEVICE","FIRST DEVICE");
-                        deviceStateBroadcastFirst();
-                        deviceMacBroadcastFirst();
+                    }if(gattList.size()>2){
+                        if(gatt.getDevice()==gattList.get(2).getmBluetoothGatt().getDevice()) {
+                            Log.i("Third DEVICE","SECOND DEVICE");
+                            mDeviceState3 = true;
+                            gattList.get(2).setDeviceStatus(true);
+                            deviceMacBradcastThird();
+                            deviceStateBroadcastThird();
+                        }
+                    }if(gattList.size()>3){
+                        if(gatt.getDevice()==gattList.get(3).getmBluetoothGatt().getDevice()) {
+                            Log.i("FOURTH DEVICE","SECOND DEVICE");
+                            mDeviceState4 = true;
+                            gattList.get(3).setDeviceStatus(true);
+                            deviceMacBradcastFourth();
+                            deviceStateBroadcastFourth();
+                        }
+                    }
+                    if(gattList.size()>4){
+                        if(gatt.getDevice()==gattList.get(4).getmBluetoothGatt().getDevice()) {
+                            Log.i("FIFTH DEVICE","SECOND DEVICE");
+                            mDeviceState5 = true;
+                            gattList.get(4).setDeviceStatus(true);
+                            deviceMacBradcastFifth();
+                            deviceStateBroadcastFifth();
+                        }
+                    }if(gattList.size()>5){
+                        if(gatt.getDevice()==gattList.get(5).getmBluetoothGatt().getDevice()) {
+                            Log.i("SIXTH DEVICE","SECOND DEVICE");
+                            mDeviceState6 = true;
+                            gattList.get(5).setDeviceStatus(true);
+                            deviceMacBradcastSixth();
+                            deviceStateBroadcastSixth();
+                        }
                     }
                 }
             }
@@ -786,26 +949,49 @@ public class PheezeeBleService extends Service {
                 if(newState==BluetoothGatt.STATE_DISCONNECTED){
                     num_of_device_connected--;
                     showNotification(device_connected_notif+"("+num_of_device_connected+")");
-                    if(gattList.size()>1){
+                    if(gattList.size()>0){
                         if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
                             mDeviceState1 = false;
                             gattList.get(0).setDeviceStatus(false);
                             Log.i("FIRST DEVICE","FIRST DEVICE");
                             deviceStateBroadcastFirst();
-                        }else {
+                        }
+                    }if(gattList.size()>1){
+                        if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()) {
                             Log.i("SECOND DEVICE","SECOND DEVICE");
                             mDeviceState2 = false;
                             gattList.get(1).setDeviceStatus(false);
                             deviceStateBroadcastSecond();
-                            gattList.remove(1);
                         }
-                    }else {
-                        mDeviceState1 = false;
-                        gattList.get(0).setDeviceStatus(false);
-                        Log.i("FIRST DEVICE","FIRST DEVICE");
-                        deviceStateBroadcastFirst();
-                        if(gattList.size()>0)
-                            gattList.remove(0);
+                    }if(gattList.size()>2){
+                        if(gatt.getDevice()==gattList.get(2).getmBluetoothGatt().getDevice()) {
+                            Log.i("Third DEVICE","SECOND DEVICE");
+                            mDeviceState3 = false;
+                            gattList.get(2).setDeviceStatus(false);
+                            deviceStateBroadcastThird();
+                        }
+                    }if(gattList.size()>3){
+                        if(gatt.getDevice()==gattList.get(3).getmBluetoothGatt().getDevice()) {
+                            Log.i("FOURTH DEVICE","SECOND DEVICE");
+                            mDeviceState4 = false;
+                            gattList.get(3).setDeviceStatus(false);
+                            deviceStateBroadcastFourth();
+                        }
+                    }
+                    if(gattList.size()>4){
+                        if(gatt.getDevice()==gattList.get(4).getmBluetoothGatt().getDevice()) {
+                            Log.i("FIFTH DEVICE","SECOND DEVICE");
+                            mDeviceState5 = false;
+                            gattList.get(4).setDeviceStatus(false);
+                            deviceStateBroadcastFifth();
+                        }
+                    }if(gattList.size()>5){
+                        if(gatt.getDevice()==gattList.get(5).getmBluetoothGatt().getDevice()) {
+                            Log.i("SIXTH DEVICE","SECOND DEVICE");
+                            mDeviceState6 = false;
+                            gattList.get(5).setDeviceStatus(false);
+                            deviceStateBroadcastSixth();
+                        }
                     }
                 }
             }
@@ -837,17 +1023,42 @@ public class PheezeeBleService extends Service {
             //session related
             if (ByteToArrayOperations.byteToStringHexadecimal(header_main).equals("A1"))  {
                     value = ByteToArrayOperations.getAngleFromData(temp_byte[1],temp_byte[2]);
-                    Log.i("Value", String.valueOf(value));
+                    if(gattList.size()>0){
+                        if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForFirstDevice(value);
+                        }
+                    }if(gattList.size()>1){
+                        if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForSecondDevice(value);
+                        }
+                    }if(gattList.size()>2){
+                        if(gatt.getDevice()==gattList.get(2).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForThirdDevice(value);
+                        }
+                    }if(gattList.size()>3){
+                        if(gatt.getDevice()==gattList.get(3).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForFourthDevice(value);
+                        }
+                    }if(gattList.size()>4){
+                        if(gatt.getDevice()==gattList.get(4).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForFifthDevice(value);
+                        }
+                    }if(gattList.size()>5){
+                        if(gatt.getDevice()==gattList.get(5).getmBluetoothGatt().getDevice()){
+                            sendSessionDataBroadcastForSixthDevice(value);
+                        }
+                    }
             }
-            if(gattList.size()>=2){
-                if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
-                    sendSessionDataBroadcastForFirstDevice(value);
-                }else {
-                    sendSessionDataBroadcastForSecondDevice(value);
-                }
-            }else {
-                sendSessionDataBroadcastForFirstDevice(value);
-            }
+
+//            if(gattList.size()>=2){
+//                if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
+//                    sendSessionDataBroadcastForFirstDevice(value);
+//                }else {
+//                    sendSessionDataBroadcastForSecondDevice(value);
+//                }
+//            }else {
+//                sendSessionDataBroadcastForFirstDevice(value);
+//            }
         }
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -888,6 +1099,30 @@ public class PheezeeBleService extends Service {
     private void sendSessionDataBroadcastForSecondDevice(int value){
         Intent i = new Intent(session_data_2);
         i.putExtra(session_data_2,value);
+        sendBroadcast(i);
+    }
+
+    private void sendSessionDataBroadcastForThirdDevice(int value){
+        Intent i = new Intent(session_data_3);
+        i.putExtra(session_data_3,value);
+        sendBroadcast(i);
+    }
+
+    private void sendSessionDataBroadcastForFourthDevice(int value){
+        Intent i = new Intent(session_data_4);
+        i.putExtra(session_data_4,value);
+        sendBroadcast(i);
+    }
+
+    private void sendSessionDataBroadcastForFifthDevice(int value){
+        Intent i = new Intent(session_data_5);
+        i.putExtra(session_data_5,value);
+        sendBroadcast(i);
+    }
+
+    private void sendSessionDataBroadcastForSixthDevice(int value){
+        Intent i = new Intent(session_data_6);
+        i.putExtra(session_data_6,value);
         sendBroadcast(i);
     }
 
@@ -939,7 +1174,8 @@ public class PheezeeBleService extends Service {
                     });
                 }
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
-                    isConnectCommandGiven = false;
+                    isConnectCommandGiven = false;mDeviceState1 = false; mDeviceState2 = false;
+                    mDeviceState3 = false; mDeviceState4 = false; mDeviceState5 = false; mDeviceState6 = false;
                     mDeviceStatus=0;
                     mBluetoothState = false;mDeviceState = false;mFirmwareVersion="Null"; mSerialId="NULL";mBatteryPercent = 0;mManufacturerName="Null";
                     mHardwareVersion="Null";

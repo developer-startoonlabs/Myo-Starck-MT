@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +50,22 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.bluetooth_state;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_1;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_3;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_4;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_5;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_6;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_1;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_3;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_4;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_5;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_6;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_1;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_2;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_3;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_4;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_5;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_6;
 
 public class HomeFragment extends Fragment {
     private static final int REQUEST_FINE_LOCATION = 14;
@@ -60,15 +73,16 @@ public class HomeFragment extends Fragment {
     PheezeeBleService mCustomService;
     private HomeViewModel homeViewModel;
     private boolean mBluetoothState = false;
-    TextView tv_first_device_state, tv_second_device_state, tv_mac_first, tv_mac_second, tv_emg1, tv_emg2;
-
-    LineChart lineChart1, lineChart2;
-    LineDataSet lineDataSet1, lineDataSet2;
-    LineData lineData1, lineData2;
-    List<Entry> dataPoints1, dataPoints2;
+    TextView tv_emg1, tv_emg2, tv_emg3, tv_emg4, tv_emg5, tv_emg6;
+    TextView tv_mac_first, tv_mac_second, tv_mac_third, tv_mac_fourth, tv_mac_fifth, tv_mac_sixth;
+    TextView tv_first_device_state, tv_second_device_state,tv_third_device_state, tv_fourth_device_state, tv_fifth_device_state, tv_sixth_device_state;
+    LineChart lineChart1, lineChart2, lineChart3, lineChart4, lineChart5, lineChart6;
+    LineDataSet lineDataSet1, lineDataSet2, lineDataSet3, lineDataSet4, lineDataSet5, lineDataSet6;
+    LineData lineData1, lineData2, lineData3, lineData4, lineData5, lineData6;
+    List<Entry> dataPoints1, dataPoints2, dataPoints3, dataPoints4, dataPoints5, dataPoints6;
 
     Button btn_start_first;
-    int num_of_entries1 = 0, num_of_entries2 = 0;
+    int num_of_entries1 = 0, num_of_entries2 = 0, num_of_entries3 = 0, num_of_entries4 = 0, num_of_entries5 = 0, num_of_entries6 = 0;
 
     long MillisecondTime1, StartTime1, TimeBuff1, UpdateTime1 = 0L;
     long MillisecondTime2, StartTime2, TimeBuff2, UpdateTime2 = 0L;
@@ -91,13 +105,36 @@ public class HomeFragment extends Fragment {
 
         tv_first_device_state = root.findViewById(R.id.tv_device_status_1);
         tv_second_device_state = root.findViewById(R.id.tv_device_status_2);
+        tv_third_device_state = root.findViewById(R.id.tv_device_status_3);
+        tv_fourth_device_state = root.findViewById(R.id.tv_device_status_4);
+        tv_fifth_device_state = root.findViewById(R.id.tv_device_status_5);
+        tv_sixth_device_state = root.findViewById(R.id.tv_device_status_6);
+
         tv_mac_first = root.findViewById(R.id.tv_mac_first);
         tv_mac_second = root.findViewById(R.id.tv_mac_second);
-        btn_start_first = root.findViewById(R.id.btn_start_device1);
+        tv_mac_third = root.findViewById(R.id.tv_mac_third);
+        tv_mac_fourth = root.findViewById(R.id.tv_mac_fourth);
+        tv_mac_fifth = root.findViewById(R.id.tv_mac_fifth);
+        tv_mac_sixth = root.findViewById(R.id.tv_mac_sixth);
+
+
+
         tv_emg1 = root.findViewById(R.id.tv_emg_data1);
         tv_emg2 = root.findViewById(R.id.tv_emg_data_2);
+        tv_emg3 = root.findViewById(R.id.tv_emg_data_3);
+        tv_emg4 = root.findViewById(R.id.tv_emg_data_4);
+        tv_emg5 = root.findViewById(R.id.tv_emg_data_5);
+        tv_emg6 = root.findViewById(R.id.tv_emg_data_6);
+
+
         lineChart1 = root.findViewById(R.id.chart);
         lineChart2 = root.findViewById(R.id.chart1);
+        lineChart3 = root.findViewById(R.id.chart2);
+        lineChart4 = root.findViewById(R.id.chart3);
+        lineChart5 = root.findViewById(R.id.chart4);
+        lineChart6 = root.findViewById(R.id.chart5);
+
+        btn_start_first = root.findViewById(R.id.btn_start_device1);
         handler1 = new Handler();
         handler2 = new Handler();
 
@@ -107,11 +144,26 @@ public class HomeFragment extends Fragment {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(device_state_1);
         intentFilter.addAction(device_state_2);
+        intentFilter.addAction(device_state_3);
+        intentFilter.addAction(device_state_4);
+        intentFilter.addAction(device_state_5);
+        intentFilter.addAction(device_state_6);
+
         intentFilter.addAction(device_mac_1);
         intentFilter.addAction(device_mac_2);
+        intentFilter.addAction(device_mac_3);
+        intentFilter.addAction(device_mac_4);
+        intentFilter.addAction(device_mac_5);
+        intentFilter.addAction(device_mac_6);
+
         intentFilter.addAction(bluetooth_state);
         intentFilter.addAction(session_data_1);
         intentFilter.addAction(session_data_2);
+        intentFilter.addAction(session_data_3);
+        intentFilter.addAction(session_data_4);
+        intentFilter.addAction(session_data_5);
+        intentFilter.addAction(session_data_6);
+
         getActivity().registerReceiver(receiver,intentFilter);
 
         homeViewModel.getDeviceState1().observe(this, new Observer<Boolean>() {
@@ -137,6 +189,52 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        homeViewModel.getDeviceState3().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    tv_third_device_state.setText("Connected");
+                }else {
+                    tv_third_device_state.setText("Not Connected");
+                }
+            }
+        });
+
+        homeViewModel.getDeviceState4().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    tv_fourth_device_state.setText("Connected");
+                }else {
+                    tv_fourth_device_state.setText("Not Connected");
+                }
+            }
+        });
+
+        homeViewModel.getDeviceState5().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    tv_fifth_device_state.setText("Connected");
+                }else {
+                    tv_fifth_device_state.setText("Not Connected");
+                }
+            }
+        });
+
+        homeViewModel.getDeviceState6().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(aBoolean){
+                    tv_sixth_device_state.setText("Connected");
+                }else {
+                    tv_sixth_device_state.setText("Not Connected");
+                }
+            }
+        });
+
+
+
         homeViewModel.getDeviceMac1().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -151,28 +249,55 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        homeViewModel.getDeviceMac3().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tv_mac_third.setText(s);
+            }
+        });
+
+        homeViewModel.getDeviceMac4().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tv_mac_fourth.setText(s);
+            }
+        });
+
+        homeViewModel.getDeviceMac5().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tv_mac_fifth.setText(s);
+            }
+        });
+
+        homeViewModel.getDeviceMac6().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tv_mac_sixth.setText(s);
+            }
+        });
+
+
         btn_start_first.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
-                        if(homeViewModel.getDeviceState1().getValue() && homeViewModel.getDeviceState2().getValue()) {
-                        num_of_entries1=0;num_of_entries2=0;
+//                        if(homeViewModel.getDeviceState1().getValue() && homeViewModel.getDeviceState2().getValue()) {
+                        num_of_entries1=0;num_of_entries2=0;num_of_entries3=0;num_of_entries4 = 0;num_of_entries5=0;num_of_entries6=0;
                         creatFirstGraphView();
-                        creatSecondGraphView();
+                        creatSecondGraphView();creatThirdGraphView();creatFourthGraphView();creatFifthGraphView();creatSixthGraphView();
                         btn_start_first.setText("STOP");
                         if (mCustomService != null) {
-                            mCustomService.startFirstDeviceNotification();
-                            mCustomService.startSecondDeviceNotification();
+                            mCustomService.startAllNotification();
                         }
                         handler1.postDelayed(runnable1, 0);
-                        }else {
-                            Toast.makeText(getActivity(), "Please Connect Both devices", Toast.LENGTH_SHORT).show();
-                        }
+//                        }else {
+//                            Toast.makeText(getActivity(), "Please Connect Both devices", Toast.LENGTH_SHORT).show();
+//                        }
                     } else {
                         btn_start_first.setText("START");
                         if (mCustomService != null) {
-                            mCustomService.stopFirstDeviceNotification();
-                            mCustomService.stopSecondDeviceNotification();
+                            mCustomService.stopAlNotification();
                         }
                         TimeBuff1 += MillisecondTime1;
                         handler1.removeCallbacks(runnable1);
@@ -244,8 +369,57 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
+        homeViewModel.getEmg3().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if(integer==-1){
+                    tv_emg3.setText("NULL");
+                }else {
+                    tv_emg3.setText(String.valueOf(integer));
+                }
+            }
+        });
+
+        homeViewModel.getEmg4().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if(integer==-1){
+                    tv_emg4.setText("NULL");
+                }else {
+                    tv_emg4.setText(String.valueOf(integer));
+                }
+            }
+        });
+
+        homeViewModel.getEmg5().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if(integer==-1){
+                    tv_emg5.setText("NULL");
+                }else {
+                    tv_emg5.setText(String.valueOf(integer));
+                }
+            }
+        });
+
+        homeViewModel.getEmg6().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if(integer==-1){
+                    tv_emg6.setText("NULL");
+                }else {
+                    tv_emg6.setText(String.valueOf(integer));
+                }
+            }
+        });
+
+
+
+
         creatFirstGraphView();
         creatSecondGraphView();
+        creatThirdGraphView();creatFourthGraphView();creatFifthGraphView();creatSixthGraphView();
 
         return root;
     }
@@ -384,6 +558,115 @@ public class HomeFragment extends Fragment {
         lineChart2.setData(lineData2);
     }
 
+    private void creatThirdGraphView() {
+        lineChart3.setHardwareAccelerationEnabled(true);
+        dataPoints3 = new ArrayList<>();
+        dataPoints3.add(new Entry(0, 0));
+        lineDataSet3 = new LineDataSet(dataPoints3, "Emg Graph");
+        lineDataSet3.setDrawCircles(false);
+        lineDataSet3.setValueTextSize(0);
+        lineDataSet3.setDrawValues(false);
+        lineDataSet3.setColor(getResources().getColor(R.color.pitch_black));
+        lineData3 = new LineData(lineDataSet3);
+        lineChart3.getXAxis();
+        lineChart3.getXAxis().setAxisMinimum(0f);
+        lineChart3.getAxisLeft().setSpaceTop(60f);
+        lineChart3.getAxisRight().setSpaceTop(60f);
+        lineChart3.getAxisRight().setDrawLabels(false);
+        lineChart3.getAxisLeft().setStartAtZero(false);
+        lineChart3.getAxisLeft().setDrawGridLines(false);
+        lineChart3.getXAxis().setDrawGridLines(false);
+        lineChart3.getXAxis().setDrawAxisLine(false);
+        lineChart3.setHorizontalScrollBarEnabled(true);
+        lineChart3.getDescription().setEnabled(false);
+        lineChart3.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart3.setScaleXEnabled(true);
+        lineChart3.fitScreen();
+        lineChart3.setData(lineData3);
+    }
+
+    private void creatFourthGraphView() {
+        lineChart4.setHardwareAccelerationEnabled(true);
+        dataPoints4 = new ArrayList<>();
+        dataPoints4.add(new Entry(0, 0));
+        lineDataSet4 = new LineDataSet(dataPoints4, "Emg Graph");
+        lineDataSet4.setDrawCircles(false);
+        lineDataSet4.setValueTextSize(0);
+        lineDataSet4.setDrawValues(false);
+        lineDataSet4.setColor(getResources().getColor(R.color.pitch_black));
+        lineData4 = new LineData(lineDataSet4);
+        lineChart4.getXAxis();
+        lineChart4.getXAxis().setAxisMinimum(0f);
+        lineChart4.getAxisLeft().setSpaceTop(60f);
+        lineChart4.getAxisRight().setSpaceTop(60f);
+        lineChart4.getAxisRight().setDrawLabels(false);
+        lineChart4.getAxisLeft().setStartAtZero(false);
+        lineChart4.getAxisLeft().setDrawGridLines(false);
+        lineChart4.getXAxis().setDrawGridLines(false);
+        lineChart4.getXAxis().setDrawAxisLine(false);
+        lineChart4.setHorizontalScrollBarEnabled(true);
+        lineChart4.getDescription().setEnabled(false);
+        lineChart4.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart4.setScaleXEnabled(true);
+        lineChart4.fitScreen();
+        lineChart4.setData(lineData4);
+    }
+
+    private void creatFifthGraphView() {
+        lineChart5.setHardwareAccelerationEnabled(true);
+        dataPoints5 = new ArrayList<>();
+        dataPoints5.add(new Entry(0, 0));
+        lineDataSet5 = new LineDataSet(dataPoints5, "Emg Graph");
+        lineDataSet5.setDrawCircles(false);
+        lineDataSet5.setValueTextSize(0);
+        lineDataSet5.setDrawValues(false);
+        lineDataSet5.setColor(getResources().getColor(R.color.pitch_black));
+        lineData5 = new LineData(lineDataSet5);
+        lineChart5.getXAxis();
+        lineChart5.getXAxis().setAxisMinimum(0f);
+        lineChart5.getAxisLeft().setSpaceTop(60f);
+        lineChart5.getAxisRight().setSpaceTop(60f);
+        lineChart5.getAxisRight().setDrawLabels(false);
+        lineChart5.getAxisLeft().setStartAtZero(false);
+        lineChart5.getAxisLeft().setDrawGridLines(false);
+        lineChart5.getXAxis().setDrawGridLines(false);
+        lineChart5.getXAxis().setDrawAxisLine(false);
+        lineChart5.setHorizontalScrollBarEnabled(true);
+        lineChart5.getDescription().setEnabled(false);
+        lineChart5.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart5.setScaleXEnabled(true);
+        lineChart5.fitScreen();
+        lineChart5.setData(lineData5);
+    }
+
+    private void creatSixthGraphView() {
+        lineChart6.setHardwareAccelerationEnabled(true);
+        dataPoints6 = new ArrayList<>();
+        dataPoints6.add(new Entry(0, 0));
+        lineDataSet6 = new LineDataSet(dataPoints6, "Emg Graph");
+        lineDataSet6.setDrawCircles(false);
+        lineDataSet6.setValueTextSize(0);
+        lineDataSet6.setDrawValues(false);
+        lineDataSet6.setColor(getResources().getColor(R.color.pitch_black));
+        lineData6 = new LineData(lineDataSet6);
+        lineChart6.getXAxis();
+        lineChart6.getXAxis().setAxisMinimum(0f);
+        lineChart6.getAxisLeft().setSpaceTop(60f);
+        lineChart6.getAxisRight().setSpaceTop(60f);
+        lineChart6.getAxisRight().setDrawLabels(false);
+        lineChart6.getAxisLeft().setStartAtZero(false);
+        lineChart6.getAxisLeft().setDrawGridLines(false);
+        lineChart6.getXAxis().setDrawGridLines(false);
+        lineChart6.getXAxis().setDrawAxisLine(false);
+        lineChart6.setHorizontalScrollBarEnabled(true);
+        lineChart6.getDescription().setEnabled(false);
+        lineChart6.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart6.setScaleXEnabled(true);
+        lineChart6.fitScreen();
+        lineChart6.setData(lineData6);
+    }
+
+
 
     public void updateFirstChart(int value){
         ++num_of_entries1;
@@ -421,6 +704,78 @@ public class HomeFragment extends Fragment {
         lineChart2.moveViewToX((float) num_of_entries2 / 50);
     }
 
+    public void updateThirdChart(int value){
+        ++num_of_entries3;
+        lineData3.addEntry(new Entry((float) num_of_entries3 / 50, value), 0);
+        lineChart3.notifyDataSetChanged();
+        lineChart3.invalidate();
+        lineChart3.getXAxis();
+        lineChart3.getAxisLeft();
+        lineChart3.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return (int) value + getResources().getString(R.string.emg_unit);
+            }
+        });
+        if (UpdateTime1 / 1000 > 3)
+            lineChart3.setVisibleXRangeMaximum(5f);
+        lineChart3.moveViewToX((float) num_of_entries3 / 50);
+    }
+
+    public void updateFourthChart(int value){
+        ++num_of_entries4;
+        lineData4.addEntry(new Entry((float) num_of_entries4 / 50, value), 0);
+        lineChart4.notifyDataSetChanged();
+        lineChart4.invalidate();
+        lineChart4.getXAxis();
+        lineChart4.getAxisLeft();
+        lineChart4.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return (int) value + getResources().getString(R.string.emg_unit);
+            }
+        });
+        if (UpdateTime1 / 1000 > 3)
+            lineChart4.setVisibleXRangeMaximum(5f);
+        lineChart4.moveViewToX((float) num_of_entries4 / 50);
+    }
+
+    public void updateFifthChart(int value){
+        ++num_of_entries5;
+        lineData5.addEntry(new Entry((float) num_of_entries5 / 50, value), 0);
+        lineChart5.notifyDataSetChanged();
+        lineChart5.invalidate();
+        lineChart5.getXAxis();
+        lineChart5.getAxisLeft();
+        lineChart5.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return (int) value + getResources().getString(R.string.emg_unit);
+            }
+        });
+        if (UpdateTime1 / 1000 > 3)
+            lineChart5.setVisibleXRangeMaximum(5f);
+        lineChart5.moveViewToX((float) num_of_entries5 / 50);
+    }
+
+    public void updateSixthChart(int value){
+        ++num_of_entries6;
+        lineData6.addEntry(new Entry((float) num_of_entries6 / 50, value), 0);
+        lineChart6.notifyDataSetChanged();
+        lineChart6.invalidate();
+        lineChart6.getXAxis();
+        lineChart6.getAxisLeft();
+        lineChart6.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return (int) value + getResources().getString(R.string.emg_unit);
+            }
+        });
+        if (UpdateTime1 / 1000 > 3)
+            lineChart6.setVisibleXRangeMaximum(5f);
+        lineChart6.moveViewToX((float) num_of_entries6 / 50);
+    }
+
 
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -435,8 +790,7 @@ public class HomeFragment extends Fragment {
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            mCustomService.stopFirstDeviceNotification();
-            mCustomService.stopSecondDeviceNotification();
+            mCustomService.stopAlNotification();
             mCustomService = null;
             isBound = false;
         }
@@ -464,8 +818,10 @@ public class HomeFragment extends Fragment {
                 boolean device_status = intent.getBooleanExtra(device_state_1,false);
                 if(device_status){
                     homeViewModel.getDeviceState1().setValue(true);
+                    Log.i("Device State", String.valueOf(true));
                 }else {
                     homeViewModel.getDeviceState1().setValue(false);
+                    Log.i("Device State", String.valueOf(false));
                 }
             }else if(action.equalsIgnoreCase(device_state_2)){
                 boolean device_status = intent.getBooleanExtra(device_state_2,false);
@@ -474,13 +830,59 @@ public class HomeFragment extends Fragment {
                 }else {
                     homeViewModel.getDeviceState2().setValue(false);
                 }
-            }else if(action.equalsIgnoreCase(device_mac_1)){
+            }else if(action.equalsIgnoreCase(device_state_3)){
+                boolean device_status = intent.getBooleanExtra(device_state_3,false);
+                if(device_status){
+                    homeViewModel.getDeviceState3().setValue(true);
+                }else {
+                    homeViewModel.getDeviceState3().setValue(false);
+                }
+            }else if(action.equalsIgnoreCase(device_state_4)){
+                boolean device_status = intent.getBooleanExtra(device_state_4,false);
+                if(device_status){
+                    homeViewModel.getDeviceState4().setValue(true);
+                }else {
+                    homeViewModel.getDeviceState4().setValue(false);
+                }
+            }else if(action.equalsIgnoreCase(device_state_5)){
+                boolean device_status = intent.getBooleanExtra(device_state_5,false);
+                if(device_status){
+                    homeViewModel.getDeviceState5().setValue(true);
+                }else {
+                    homeViewModel.getDeviceState5().setValue(false);
+                }
+            }else if(action.equalsIgnoreCase(device_state_6)){
+                boolean device_status = intent.getBooleanExtra(device_state_6,false);
+                if(device_status){
+                    homeViewModel.getDeviceState6().setValue(true);
+                }else {
+                    homeViewModel.getDeviceState6().setValue(false);
+                }
+            }
+
+
+            else if(action.equalsIgnoreCase(device_mac_1)){
                 String device_mac = intent.getStringExtra(device_mac_1);
                 homeViewModel.getDeviceMac1().setValue(device_mac);
             }else if(action.equalsIgnoreCase(device_mac_2)){
                 String device_mac = intent.getStringExtra(device_mac_2);
                 homeViewModel.getDeviceMac2().setValue(device_mac);
-            }else if(action.equalsIgnoreCase(session_data_1)){
+            }else if(action.equalsIgnoreCase(device_mac_3)){
+                String device_mac = intent.getStringExtra(device_mac_3);
+                homeViewModel.getDeviceMac3().setValue(device_mac);
+            }else if(action.equalsIgnoreCase(device_mac_4)){
+                String device_mac = intent.getStringExtra(device_mac_4);
+                homeViewModel.getDeviceMac4().setValue(device_mac);
+            }else if(action.equalsIgnoreCase(device_mac_5)){
+                String device_mac = intent.getStringExtra(device_mac_5);
+                homeViewModel.getDeviceMac5().setValue(device_mac);
+            }else if(action.equalsIgnoreCase(device_mac_6)){
+                String device_mac = intent.getStringExtra(device_mac_6);
+                homeViewModel.getDeviceMac6().setValue(device_mac);
+            }
+
+
+            else if(action.equalsIgnoreCase(session_data_1)){
                 int emg = intent.getIntExtra(session_data_1,0);
                 homeViewModel.getEmg1().setValue(emg);
                 updateFirstChart(emg);
@@ -488,7 +890,25 @@ public class HomeFragment extends Fragment {
                 int emg = intent.getIntExtra(session_data_2,0);
                 homeViewModel.getEmg2().setValue(emg);
                 updateSecondChart(emg);
-            }else if(action.equalsIgnoreCase(bluetooth_state)){
+            }else if(action.equalsIgnoreCase(session_data_3)){
+                int emg = intent.getIntExtra(session_data_3,0);
+                homeViewModel.getEmg3().setValue(emg);
+                updateThirdChart(emg);
+            } else if(action.equalsIgnoreCase(session_data_4)){
+                int emg = intent.getIntExtra(session_data_4,0);
+                homeViewModel.getEmg4().setValue(emg);
+                updateFourthChart(emg);
+            }else if(action.equalsIgnoreCase(session_data_5)){
+                int emg = intent.getIntExtra(session_data_5,0);
+                homeViewModel.getEmg5().setValue(emg);
+                updateFifthChart(emg);
+            } else if(action.equalsIgnoreCase(session_data_6)){
+                int emg = intent.getIntExtra(session_data_6,0);
+                homeViewModel.getEmg6().setValue(emg);
+                updateSixthChart(emg);
+            }
+
+            else if(action.equalsIgnoreCase(bluetooth_state)){
                 boolean ble_state = intent.getBooleanExtra(bluetooth_state,false);
                 if(ble_state){
                     mBluetoothState = true;
