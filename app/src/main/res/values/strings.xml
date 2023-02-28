@@ -6,4 +6,8 @@
     <string name="connected">Connected</string>
     <string name="not_connected">Not Connected</string>
     <string name="emg_unit">μV</string>
+    <string name="cd_bluetooth_connected">Bluetooth Connected Icon</string>
+    <string name="cd_bluetooth_disconnected">Bluetooth Disconnected Icon</string>
+    <string name="cd_device_disconnected">Device Disconnected</string>
+    <string name="cd_device_connected">Device Connected</string>
 </resources>

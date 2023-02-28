@@ -1,5 +1,8 @@
 package com.startoonlabs.apps.multipleble.utils;
 
+import android.os.Message;
+import android.util.Log;
+
 /**
  * Main class with the packet structure emg
  */
@@ -99,6 +102,24 @@ public class ByteToArrayOperations {
             }
         }
         return uid.toString();
+    }
+
+    public static Boolean getMagnetometerPresent(byte[] info_packet) {
+        boolean magnetometer_status = false;
+        try{
+            int a = info_packet[39] & 0xFF;
+            int b = info_packet[40] & 0xFF;
+            Log.i("a,b",a+", "+b);
+            if(a==0 && b==0){
+                magnetometer_status = true;
+            }
+        }catch (ArrayIndexOutOfBoundsException e){
+            magnetometer_status = false;
+        }catch (IndexOutOfBoundsException e){
+            magnetometer_status = false;
+        }
+        return magnetometer_status;
+
     }
 
 //    public static HealthData getHealthData(byte[] info_packet){

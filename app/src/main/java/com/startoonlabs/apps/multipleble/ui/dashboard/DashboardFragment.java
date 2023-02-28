@@ -19,6 +19,7 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.startoonlabs.apps.multipleble.R;
@@ -66,6 +68,9 @@ public class DashboardFragment extends Fragment {
 
 
     PheezeeBleService mCustomService;
+
+    ImageView iv_back_app_info;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         dashboardViewModel =
@@ -80,6 +85,7 @@ public class DashboardFragment extends Fragment {
         checkPermissionsRequired();
         checkLocationEnabled();
 
+        iv_back_app_info =root.findViewById(R.id.iv_back_app_info);
         lv_scandevices =root.findViewById(R.id.lv_deviceList);
         swipeRefreshLayout = root.findViewById(R.id.scandevices_swiperefresh);
         mScanResults = new ArrayList<>();
@@ -128,6 +134,12 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        iv_back_app_info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Navigation.findNavController(view).navigate(R.id.navigation_home);
+            }
+        });
 
         lv_scandevices.setAdapter(deviceListArrayAdapter);
 

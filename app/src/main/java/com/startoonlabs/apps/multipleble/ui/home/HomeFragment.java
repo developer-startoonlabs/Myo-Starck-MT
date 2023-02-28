@@ -1,6 +1,7 @@
 package com.startoonlabs.apps.multipleble.ui.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,9 +11,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
@@ -20,8 +23,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,21 +35,25 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.startoonlabs.apps.multipleble.R;
 import com.startoonlabs.apps.multipleble.services.PheezeeBleService;
+import com.startoonlabs.apps.multipleble.utils.ByteToArrayOperations;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static android.Manifest.permission.BLUETOOTH_CONNECT;
+import static android.Manifest.permission.BLUETOOTH_SCAN;
+import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.Manifest.permission_group.CAMERA;
 import static android.content.Context.BIND_AUTO_CREATE;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.bluetooth_state;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_mac_1;
@@ -60,6 +68,7 @@ import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.devic
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_4;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_5;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.device_state_6;
+import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_1;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_2;
 import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.session_data_3;
@@ -71,6 +80,8 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_FINE_LOCATION = 14;
     boolean isBound = false;
     PheezeeBleService mCustomService;
+
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 200;
     private HomeViewModel homeViewModel;
     private boolean mBluetoothState = false;
     TextView tv_emg1, tv_emg2, tv_emg3, tv_emg4, tv_emg5, tv_emg6;
@@ -80,6 +91,13 @@ public class HomeFragment extends Fragment {
     LineDataSet lineDataSet1, lineDataSet2, lineDataSet3, lineDataSet4, lineDataSet5, lineDataSet6;
     LineData lineData1, lineData2, lineData3, lineData4, lineData5, lineData6;
     List<Entry> dataPoints1, dataPoints2, dataPoints3, dataPoints4, dataPoints5, dataPoints6;
+    LinearLayout add_device_bar;
+
+    ProgressBar progress_bar_one,progress_bar_two;
+
+    TextView tv_max_emg_show_one, tv_max_emg_show_two, max_emg_one, max_emg_two;
+
+
 
     Button btn_start_first;
     int num_of_entries1 = 0, num_of_entries2 = 0, num_of_entries3 = 0, num_of_entries4 = 0, num_of_entries5 = 0, num_of_entries6 = 0;
@@ -88,10 +106,13 @@ public class HomeFragment extends Fragment {
     long MillisecondTime2, StartTime2, TimeBuff2, UpdateTime2 = 0L;
     Long tsLong1 = 0L, tsLong2 = 0L;
 
+    boolean mSessionStarted = false;
+
     Handler handler1, handler2;
+    @SuppressLint("MissingInflatedId")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home,container,false);
+        View root = inflater.inflate(R.layout.new_device_file,container,false);
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         homeViewModel.getText().observe(this, new Observer<String>() {
@@ -99,40 +120,25 @@ public class HomeFragment extends Fragment {
             public void onChanged(@Nullable String s) {
             }
         });
-        checkPermissionsRequired();
+//        checkPermissionsRequired();
         checkLocationEnabled();
+        checkAndRequestPermissions();
 
+
+        add_device_bar = root.findViewById(R.id.add_device_bar);
+
+        progress_bar_one = root.findViewById(R.id.progress_bar_one);
+        progress_bar_two = root.findViewById(R.id.progress_bar_two);
+        tv_max_emg_show_one = root.findViewById(R.id.tv_max_emg_show_one);
+        tv_max_emg_show_two = root.findViewById(R.id.tv_max_emg_show_two);
+        max_emg_one = root.findViewById(R.id.max_emg_one);
+        max_emg_two = root.findViewById(R.id.max_emg_two);
 
         tv_first_device_state = root.findViewById(R.id.tv_device_status_1);
         tv_second_device_state = root.findViewById(R.id.tv_device_status_2);
-        tv_third_device_state = root.findViewById(R.id.tv_device_status_3);
-        tv_fourth_device_state = root.findViewById(R.id.tv_device_status_4);
-        tv_fifth_device_state = root.findViewById(R.id.tv_device_status_5);
-        tv_sixth_device_state = root.findViewById(R.id.tv_device_status_6);
 
         tv_mac_first = root.findViewById(R.id.tv_mac_first);
         tv_mac_second = root.findViewById(R.id.tv_mac_second);
-        tv_mac_third = root.findViewById(R.id.tv_mac_third);
-        tv_mac_fourth = root.findViewById(R.id.tv_mac_fourth);
-        tv_mac_fifth = root.findViewById(R.id.tv_mac_fifth);
-        tv_mac_sixth = root.findViewById(R.id.tv_mac_sixth);
-
-
-
-        tv_emg1 = root.findViewById(R.id.tv_emg_data1);
-        tv_emg2 = root.findViewById(R.id.tv_emg_data_2);
-        tv_emg3 = root.findViewById(R.id.tv_emg_data_3);
-        tv_emg4 = root.findViewById(R.id.tv_emg_data_4);
-        tv_emg5 = root.findViewById(R.id.tv_emg_data_5);
-        tv_emg6 = root.findViewById(R.id.tv_emg_data_6);
-
-
-        lineChart1 = root.findViewById(R.id.chart);
-        lineChart2 = root.findViewById(R.id.chart1);
-        lineChart3 = root.findViewById(R.id.chart2);
-        lineChart4 = root.findViewById(R.id.chart3);
-        lineChart5 = root.findViewById(R.id.chart4);
-        lineChart6 = root.findViewById(R.id.chart5);
 
         btn_start_first = root.findViewById(R.id.btn_start_device1);
         handler1 = new Handler();
@@ -166,6 +172,7 @@ public class HomeFragment extends Fragment {
 
         getActivity().registerReceiver(receiver,intentFilter);
 
+
         homeViewModel.getDeviceState1().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
@@ -189,49 +196,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        homeViewModel.getDeviceState3().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    tv_third_device_state.setText("Connected");
-                }else {
-                    tv_third_device_state.setText("Not Connected");
-                }
-            }
-        });
-
-        homeViewModel.getDeviceState4().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    tv_fourth_device_state.setText("Connected");
-                }else {
-                    tv_fourth_device_state.setText("Not Connected");
-                }
-            }
-        });
-
-        homeViewModel.getDeviceState5().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    tv_fifth_device_state.setText("Connected");
-                }else {
-                    tv_fifth_device_state.setText("Not Connected");
-                }
-            }
-        });
-
-        homeViewModel.getDeviceState6().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    tv_sixth_device_state.setText("Connected");
-                }else {
-                    tv_sixth_device_state.setText("Not Connected");
-                }
-            }
-        });
 
 
 
@@ -249,51 +213,37 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        homeViewModel.getDeviceMac3().observe(this, new Observer<String>() {
+
+        add_device_bar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(String s) {
-                tv_mac_third.setText(s);
+            public void onClick(View view) {
+                checkPermissionsRequired();
+                Navigation.findNavController(view).navigate(R.id.navigation_dashboard);
             }
         });
-
-        homeViewModel.getDeviceMac4().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                tv_mac_fourth.setText(s);
-            }
-        });
-
-        homeViewModel.getDeviceMac5().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                tv_mac_fifth.setText(s);
-            }
-        });
-
-        homeViewModel.getDeviceMac6().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                tv_mac_sixth.setText(s);
-            }
-        });
-
 
         btn_start_first.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                    if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
-//                        if(homeViewModel.getDeviceState1().getValue() && homeViewModel.getDeviceState2().getValue()) {
+            public void onClick(View view) {
+//                startSessions();
+                if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
+
+//                    if(getSessionData()!=null) {
+//
+//                        Message message = new Message();
+//                        message.obj = getSessionData().obj;
+//                        myHandler.sendMessage(message);
+//                    }
+
+//                        mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
+//                                01, 01, 01);
+//                        Toast.makeText(getActivity(),"kranthi",Toast.LENGTH_SHORT).show();
                         num_of_entries1=0;num_of_entries2=0;num_of_entries3=0;num_of_entries4 = 0;num_of_entries5=0;num_of_entries6=0;
-                        creatFirstGraphView();
-                        creatSecondGraphView();creatThirdGraphView();creatFourthGraphView();creatFifthGraphView();creatSixthGraphView();
                         btn_start_first.setText("STOP");
                         if (mCustomService != null) {
                             mCustomService.startAllNotification();
                         }
                         handler1.postDelayed(runnable1, 0);
-//                        }else {
-//                            Toast.makeText(getActivity(), "Please Connect Both devices", Toast.LENGTH_SHORT).show();
-//                        }
                     } else {
                         btn_start_first.setText("START");
                         if (mCustomService != null) {
@@ -310,51 +260,60 @@ public class HomeFragment extends Fragment {
                     }
 
             }
+
+
+
         });
 
 
 
-//        btn_start_second.setOnClickListener(new View.OnClickListener() {
+
+
+
+
+//        btn_start_first.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                    if (btn_start_second.getText().toString().equalsIgnoreCase("start")) {
-//                        if(homeViewModel.getDeviceState2().getValue()) {
-//                            num_of_entries2=0;
-//                            creatSecondGraphView();
-//                            btn_start_second.setText("STOP");
-//                            if (mCustomService != null) {
-//                                mCustomService.startSecondDeviceNotification();
-//                            }
-//                        }else {
-//                            Toast.makeText(getActivity(), "Please Connect device", Toast.LENGTH_SHORT).show();
-//                        }
-//                        handler2.postDelayed(runnable2, 0);
-//                    } else {
-//                        btn_start_second.setText("START");
+//                    if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
+//                        mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
+//                                01, 01, 01);
+////                        Toast.makeText(getActivity(),"kranthi",Toast.LENGTH_SHORT).show();
+//                        num_of_entries1=0;num_of_entries2=0;num_of_entries3=0;num_of_entries4 = 0;num_of_entries5=0;num_of_entries6=0;
+//                        btn_start_first.setText("STOP");
 //                        if (mCustomService != null) {
-//                            mCustomService.stopSecondDeviceNotification();
+//                            mCustomService.startAllNotification();
 //                        }
-//                        TimeBuff2 += MillisecondTime2;
-//                        handler2.removeCallbacks(runnable2);
-//                        MillisecondTime2 = 0L;
-//                        StartTime2 = 0L;
-//                        TimeBuff2 = 0L;
-//                        UpdateTime2 = 0L;
-//                        num_of_entries2=0;
-//                        tsLong2 = System.currentTimeMillis();
+//                        handler1.postDelayed(runnable1, 0);
+//                    } else {
+//                        btn_start_first.setText("START");
+//                        if (mCustomService != null) {
+//                            mCustomService.stopAlNotification();
+//                        }
+//                        TimeBuff1 += MillisecondTime1;
+//                        handler1.removeCallbacks(runnable1);
+//                        MillisecondTime1 = 0L;
+//                        StartTime1 = 0L;
+//                        num_of_entries1=0;
+//                        TimeBuff1 = 0L;
+//                        UpdateTime1 = 0L;
+//                        tsLong1 = System.currentTimeMillis();
 //                    }
 //
 //            }
 //        });
 
 
+
         homeViewModel.getEmg1().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if(integer==-1){
-                    tv_emg1.setText("NULL");
+                    tv_max_emg_show_one.setText("0".concat("μV"));
+                    progress_bar_one.setProgress(0);
                 }else {
-                    tv_emg1.setText(String.valueOf(integer));
+                    tv_max_emg_show_one.setText(String.valueOf(integer).concat("μV"));
+                    Log.e("integer", String.valueOf(integer));
+                    progress_bar_one.setProgress(integer);
                 }
             }
         });
@@ -363,65 +322,182 @@ public class HomeFragment extends Fragment {
             @Override
             public void onChanged(Integer integer) {
                 if(integer==-1){
-                    tv_emg2.setText("NULL");
+                    tv_max_emg_show_two.setText("0".concat("μV"));
+                    progress_bar_two.setProgress(0);
                 }else {
-                    tv_emg2.setText(String.valueOf(integer));
+                    tv_max_emg_show_one.setText(String.valueOf(integer).concat("μV"));
+                    progress_bar_two.setProgress(integer);
                 }
             }
         });
-
-        homeViewModel.getEmg3().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if(integer==-1){
-                    tv_emg3.setText("NULL");
-                }else {
-                    tv_emg3.setText(String.valueOf(integer));
-                }
-            }
-        });
-
-        homeViewModel.getEmg4().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if(integer==-1){
-                    tv_emg4.setText("NULL");
-                }else {
-                    tv_emg4.setText(String.valueOf(integer));
-                }
-            }
-        });
-
-        homeViewModel.getEmg5().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if(integer==-1){
-                    tv_emg5.setText("NULL");
-                }else {
-                    tv_emg5.setText(String.valueOf(integer));
-                }
-            }
-        });
-
-        homeViewModel.getEmg6().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if(integer==-1){
-                    tv_emg6.setText("NULL");
-                }else {
-                    tv_emg6.setText(String.valueOf(integer));
-                }
-            }
-        });
-
-
-
-
-        creatFirstGraphView();
-        creatSecondGraphView();
-        creatThirdGraphView();creatFourthGraphView();creatFifthGraphView();creatSixthGraphView();
 
         return root;
+    }
+
+//    private void startSessions() {
+//
+//        mSessionStarted = true;
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
+//                        01, 01, 01);
+//            }
+//        }, 100);
+////                if(getSessionData()!=null) {
+////                    Message message = new Message();
+////                    message.obj = getSessionData().obj;
+////                    myHandler.sendMessage(message);
+////                }
+//
+////        EmgReciver();
+//
+//
+//    }
+
+
+////    private void EmgReciver() {
+////
+////        IntentFilter intentFilter = new IntentFilter();
+////        intentFilter.addAction(session_data_1);
+////        getActivity().registerReceiver(session_data_receiver,intentFilter);
+////    }
+//
+//    BroadcastReceiver session_data_receiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//
+//            String action = intent.getAction();
+//
+//
+//            if(action.equalsIgnoreCase(session_data)){
+//
+////                if(getSessionData()!=null) {
+////                    Message message = new Message();
+////                    message.obj = getSessionData().obj;
+////                    myHandler.sendMessage(message);
+////                }
+//            }
+//        }
+//    };
+//
+//    public Message getSessionData(){
+//        if(mCustomService!=null) {
+//            Message msg = mCustomService.getSessionData();
+//            return msg;
+//        }
+//        return null;
+//    }
+//
+//    @SuppressLint("HandlerLeak")
+//    public final Handler myHandler = new Handler() {
+//        public void handleMessage(Message message) {
+//
+//            if (mSessionStarted) {
+//
+//                int angleDetected = 0, num_of_reps = 0, hold_time_minutes, hold_time_seconds, active_time_minutes, active_time_seconds, hold_angle = 0;
+//                int emg_data, error_device = 0;
+//                byte[] sub_byte;
+//                sub_byte = (byte[]) message.obj;
+//                Log.e("Kranthi_status", String.valueOf(sub_byte));
+//                if (sub_byte != null) {
+//
+//                    error_device = sub_byte[10] & 0xFF;
+//                    if (error_device == 0) {
+//                        emg_data = ByteToArrayOperations.getAngleFromData(sub_byte[0], sub_byte[1]);
+//                        Log.e("emg_data_testing", String.valueOf(emg_data));
+////                        tv_max_emg_show.setText(emg_data+"μV");
+////                        progress_bar.setProgress(emg_data);
+////                        maxEmgValue = maxEmgValue < emg_data ? emg_data : maxEmgValue;
+////                        tv_max_emg_show_tgt.setText(String.valueOf(maxEmgValue)+"μV");
+//////                        int pg = emg_data * 2 ;
+////                        if(emg_data <= 100){
+////                            progress_bar.setMax(100);
+////                        }else{
+////                            progress_bar.setMax(pg);
+////                        }
+//
+//
+//                        angleDetected = ByteToArrayOperations.getAngleFromData(sub_byte[2], sub_byte[3]);
+//
+//                        num_of_reps = ByteToArrayOperations.getNumberOfReps(sub_byte[4], sub_byte[5]);
+//                        if (sub_byte.length > 11) {
+//                            hold_angle = ByteToArrayOperations.getAngleFromData(sub_byte[11], sub_byte[12]);
+//                        }
+//
+//
+//                        hold_time_minutes = sub_byte[6];
+//                        hold_time_seconds = sub_byte[7];
+//                        active_time_minutes = sub_byte[8];
+//                        active_time_seconds = sub_byte[9];
+//
+//
+//                        String repetitionValue = "" + num_of_reps;
+//
+//
+//                        String minutesValue = "" + hold_time_minutes, secondsValue = "" + hold_time_seconds;
+//                        if (hold_time_minutes < 10)
+//                            minutesValue = "0" + hold_time_minutes;
+//                        if (hold_time_seconds < 10)
+//                            secondsValue = "0" + hold_time_seconds;
+//
+//
+//                    }
+//                }
+//            }
+//        }
+//
+//
+//    };
+
+
+    private  boolean checkAndRequestPermissions() {
+
+
+        int locationPermission = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        int permissionStorage = ContextCompat.checkSelfPermission(getContext(), WRITE_EXTERNAL_STORAGE);
+        int permissionCamera = ContextCompat.checkSelfPermission(getContext(), CAMERA);
+        int phonePermission = ContextCompat.checkSelfPermission(getContext(),READ_PHONE_STATE);
+        int bluetooth_permission = ContextCompat.checkSelfPermission(getContext(),BLUETOOTH_CONNECT);
+        int bluetooth_permission_2 = ContextCompat.checkSelfPermission(getContext(),BLUETOOTH_SCAN);
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (locationPermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (permissionStorage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (permissionCamera != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+        if(phonePermission != PackageManager.PERMISSION_GRANTED){
+            listPermissionsNeeded.add(READ_PHONE_STATE);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(bluetooth_permission_2 != PackageManager.PERMISSION_GRANTED){
+                listPermissionsNeeded.add(BLUETOOTH_SCAN);
+            }
+            if(bluetooth_permission != PackageManager.PERMISSION_GRANTED){
+                listPermissionsNeeded.add(BLUETOOTH_CONNECT);
+            }
+
+        }
+
+
+//        if(bluetooth_permission_2 != PackageManager.PERMISSION_GRANTED){
+//            listPermissionsNeeded.add(BLUETOOTH_SCAN);
+//        }
+//        if(bluetooth_permission != PackageManager.PERMISSION_GRANTED){
+//            listPermissionsNeeded.add(BLUETOOTH_SCAN);
+//        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(getActivity(), listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
     }
 
     private void checkPermissionsRequired() {
@@ -504,277 +580,277 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    private void creatFirstGraphView() {
-        lineChart1.setHardwareAccelerationEnabled(true);
-        dataPoints1 = new ArrayList<>();
-        dataPoints1.add(new Entry(0, 0));
-        lineDataSet1 = new LineDataSet(dataPoints1, "Emg Graph");
-        lineDataSet1.setDrawCircles(false);
-        lineDataSet1.setValueTextSize(0);
-        lineDataSet1.setDrawValues(false);
-        lineDataSet1.setColor(getResources().getColor(R.color.pitch_black));
-        lineData1 = new LineData(lineDataSet1);
-        lineChart1.getXAxis();
-        lineChart1.getXAxis().setAxisMinimum(0f);
-        lineChart1.getAxisLeft().setSpaceTop(60f);
-        lineChart1.getAxisRight().setSpaceTop(60f);
-        lineChart1.getAxisRight().setDrawLabels(false);
-        lineChart1.getAxisLeft().setStartAtZero(false);
-        lineChart1.getAxisLeft().setDrawGridLines(false);
-        lineChart1.getXAxis().setDrawGridLines(false);
-        lineChart1.getXAxis().setDrawAxisLine(false);
-        lineChart1.setHorizontalScrollBarEnabled(true);
-        lineChart1.getDescription().setEnabled(false);
-        lineChart1.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart1.setScaleXEnabled(true);
-        lineChart1.fitScreen();
-        lineChart1.setData(lineData1);
-    }
-
-    private void creatSecondGraphView() {
-        lineChart2.setHardwareAccelerationEnabled(true);
-        dataPoints2 = new ArrayList<>();
-        dataPoints2.add(new Entry(0, 0));
-        lineDataSet2 = new LineDataSet(dataPoints2, "Emg Graph");
-        lineDataSet2.setDrawCircles(false);
-        lineDataSet2.setValueTextSize(0);
-        lineDataSet2.setDrawValues(false);
-        lineDataSet2.setColor(getResources().getColor(R.color.pitch_black));
-        lineData2 = new LineData(lineDataSet2);
-        lineChart2.getXAxis();
-        lineChart2.getXAxis().setAxisMinimum(0f);
-        lineChart2.getAxisLeft().setSpaceTop(60f);
-        lineChart2.getAxisRight().setSpaceTop(60f);
-        lineChart2.getAxisRight().setDrawLabels(false);
-        lineChart2.getAxisLeft().setStartAtZero(false);
-        lineChart2.getAxisLeft().setDrawGridLines(false);
-        lineChart2.getXAxis().setDrawGridLines(false);
-        lineChart2.getXAxis().setDrawAxisLine(false);
-        lineChart2.setHorizontalScrollBarEnabled(true);
-        lineChart2.getDescription().setEnabled(false);
-        lineChart2.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart2.setScaleXEnabled(true);
-        lineChart2.fitScreen();
-        lineChart2.setData(lineData2);
-    }
-
-    private void creatThirdGraphView() {
-        lineChart3.setHardwareAccelerationEnabled(true);
-        dataPoints3 = new ArrayList<>();
-        dataPoints3.add(new Entry(0, 0));
-        lineDataSet3 = new LineDataSet(dataPoints3, "Emg Graph");
-        lineDataSet3.setDrawCircles(false);
-        lineDataSet3.setValueTextSize(0);
-        lineDataSet3.setDrawValues(false);
-        lineDataSet3.setColor(getResources().getColor(R.color.pitch_black));
-        lineData3 = new LineData(lineDataSet3);
-        lineChart3.getXAxis();
-        lineChart3.getXAxis().setAxisMinimum(0f);
-        lineChart3.getAxisLeft().setSpaceTop(60f);
-        lineChart3.getAxisRight().setSpaceTop(60f);
-        lineChart3.getAxisRight().setDrawLabels(false);
-        lineChart3.getAxisLeft().setStartAtZero(false);
-        lineChart3.getAxisLeft().setDrawGridLines(false);
-        lineChart3.getXAxis().setDrawGridLines(false);
-        lineChart3.getXAxis().setDrawAxisLine(false);
-        lineChart3.setHorizontalScrollBarEnabled(true);
-        lineChart3.getDescription().setEnabled(false);
-        lineChart3.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart3.setScaleXEnabled(true);
-        lineChart3.fitScreen();
-        lineChart3.setData(lineData3);
-    }
-
-    private void creatFourthGraphView() {
-        lineChart4.setHardwareAccelerationEnabled(true);
-        dataPoints4 = new ArrayList<>();
-        dataPoints4.add(new Entry(0, 0));
-        lineDataSet4 = new LineDataSet(dataPoints4, "Emg Graph");
-        lineDataSet4.setDrawCircles(false);
-        lineDataSet4.setValueTextSize(0);
-        lineDataSet4.setDrawValues(false);
-        lineDataSet4.setColor(getResources().getColor(R.color.pitch_black));
-        lineData4 = new LineData(lineDataSet4);
-        lineChart4.getXAxis();
-        lineChart4.getXAxis().setAxisMinimum(0f);
-        lineChart4.getAxisLeft().setSpaceTop(60f);
-        lineChart4.getAxisRight().setSpaceTop(60f);
-        lineChart4.getAxisRight().setDrawLabels(false);
-        lineChart4.getAxisLeft().setStartAtZero(false);
-        lineChart4.getAxisLeft().setDrawGridLines(false);
-        lineChart4.getXAxis().setDrawGridLines(false);
-        lineChart4.getXAxis().setDrawAxisLine(false);
-        lineChart4.setHorizontalScrollBarEnabled(true);
-        lineChart4.getDescription().setEnabled(false);
-        lineChart4.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart4.setScaleXEnabled(true);
-        lineChart4.fitScreen();
-        lineChart4.setData(lineData4);
-    }
-
-    private void creatFifthGraphView() {
-        lineChart5.setHardwareAccelerationEnabled(true);
-        dataPoints5 = new ArrayList<>();
-        dataPoints5.add(new Entry(0, 0));
-        lineDataSet5 = new LineDataSet(dataPoints5, "Emg Graph");
-        lineDataSet5.setDrawCircles(false);
-        lineDataSet5.setValueTextSize(0);
-        lineDataSet5.setDrawValues(false);
-        lineDataSet5.setColor(getResources().getColor(R.color.pitch_black));
-        lineData5 = new LineData(lineDataSet5);
-        lineChart5.getXAxis();
-        lineChart5.getXAxis().setAxisMinimum(0f);
-        lineChart5.getAxisLeft().setSpaceTop(60f);
-        lineChart5.getAxisRight().setSpaceTop(60f);
-        lineChart5.getAxisRight().setDrawLabels(false);
-        lineChart5.getAxisLeft().setStartAtZero(false);
-        lineChart5.getAxisLeft().setDrawGridLines(false);
-        lineChart5.getXAxis().setDrawGridLines(false);
-        lineChart5.getXAxis().setDrawAxisLine(false);
-        lineChart5.setHorizontalScrollBarEnabled(true);
-        lineChart5.getDescription().setEnabled(false);
-        lineChart5.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart5.setScaleXEnabled(true);
-        lineChart5.fitScreen();
-        lineChart5.setData(lineData5);
-    }
-
-    private void creatSixthGraphView() {
-        lineChart6.setHardwareAccelerationEnabled(true);
-        dataPoints6 = new ArrayList<>();
-        dataPoints6.add(new Entry(0, 0));
-        lineDataSet6 = new LineDataSet(dataPoints6, "Emg Graph");
-        lineDataSet6.setDrawCircles(false);
-        lineDataSet6.setValueTextSize(0);
-        lineDataSet6.setDrawValues(false);
-        lineDataSet6.setColor(getResources().getColor(R.color.pitch_black));
-        lineData6 = new LineData(lineDataSet6);
-        lineChart6.getXAxis();
-        lineChart6.getXAxis().setAxisMinimum(0f);
-        lineChart6.getAxisLeft().setSpaceTop(60f);
-        lineChart6.getAxisRight().setSpaceTop(60f);
-        lineChart6.getAxisRight().setDrawLabels(false);
-        lineChart6.getAxisLeft().setStartAtZero(false);
-        lineChart6.getAxisLeft().setDrawGridLines(false);
-        lineChart6.getXAxis().setDrawGridLines(false);
-        lineChart6.getXAxis().setDrawAxisLine(false);
-        lineChart6.setHorizontalScrollBarEnabled(true);
-        lineChart6.getDescription().setEnabled(false);
-        lineChart6.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart6.setScaleXEnabled(true);
-        lineChart6.fitScreen();
-        lineChart6.setData(lineData6);
-    }
-
-
-
-    public void updateFirstChart(int value){
-        ++num_of_entries1;
-        lineData1.addEntry(new Entry((float) num_of_entries1 / 50, value), 0);
-        lineChart1.notifyDataSetChanged();
-        lineChart1.invalidate();
-        lineChart1.getXAxis();
-        lineChart1.getAxisLeft();
-        lineChart1.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart1.setVisibleXRangeMaximum(5f);
-        lineChart1.moveViewToX((float) num_of_entries1 / 50);
-    }
-
-    public void updateSecondChart(int value){
-        ++num_of_entries2;
-        lineData2.addEntry(new Entry((float) num_of_entries2 / 50, value), 0);
-        lineChart2.notifyDataSetChanged();
-        lineChart2.invalidate();
-        lineChart2.getXAxis();
-        lineChart2.getAxisLeft();
-        lineChart2.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart2.setVisibleXRangeMaximum(5f);
-        lineChart2.moveViewToX((float) num_of_entries2 / 50);
-    }
-
-    public void updateThirdChart(int value){
-        ++num_of_entries3;
-        lineData3.addEntry(new Entry((float) num_of_entries3 / 50, value), 0);
-        lineChart3.notifyDataSetChanged();
-        lineChart3.invalidate();
-        lineChart3.getXAxis();
-        lineChart3.getAxisLeft();
-        lineChart3.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart3.setVisibleXRangeMaximum(5f);
-        lineChart3.moveViewToX((float) num_of_entries3 / 50);
-    }
-
-    public void updateFourthChart(int value){
-        ++num_of_entries4;
-        lineData4.addEntry(new Entry((float) num_of_entries4 / 50, value), 0);
-        lineChart4.notifyDataSetChanged();
-        lineChart4.invalidate();
-        lineChart4.getXAxis();
-        lineChart4.getAxisLeft();
-        lineChart4.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart4.setVisibleXRangeMaximum(5f);
-        lineChart4.moveViewToX((float) num_of_entries4 / 50);
-    }
-
-    public void updateFifthChart(int value){
-        ++num_of_entries5;
-        lineData5.addEntry(new Entry((float) num_of_entries5 / 50, value), 0);
-        lineChart5.notifyDataSetChanged();
-        lineChart5.invalidate();
-        lineChart5.getXAxis();
-        lineChart5.getAxisLeft();
-        lineChart5.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart5.setVisibleXRangeMaximum(5f);
-        lineChart5.moveViewToX((float) num_of_entries5 / 50);
-    }
-
-    public void updateSixthChart(int value){
-        ++num_of_entries6;
-        lineData6.addEntry(new Entry((float) num_of_entries6 / 50, value), 0);
-        lineChart6.notifyDataSetChanged();
-        lineChart6.invalidate();
-        lineChart6.getXAxis();
-        lineChart6.getAxisLeft();
-        lineChart6.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return (int) value + getResources().getString(R.string.emg_unit);
-            }
-        });
-        if (UpdateTime1 / 1000 > 3)
-            lineChart6.setVisibleXRangeMaximum(5f);
-        lineChart6.moveViewToX((float) num_of_entries6 / 50);
-    }
+//    private void creatFirstGraphView() {
+//        lineChart1.setHardwareAccelerationEnabled(true);
+//        dataPoints1 = new ArrayList<>();
+//        dataPoints1.add(new Entry(0, 0));
+//        lineDataSet1 = new LineDataSet(dataPoints1, "Emg Graph");
+//        lineDataSet1.setDrawCircles(false);
+//        lineDataSet1.setValueTextSize(0);
+//        lineDataSet1.setDrawValues(false);
+//        lineDataSet1.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData1 = new LineData(lineDataSet1);
+//        lineChart1.getXAxis();
+//        lineChart1.getXAxis().setAxisMinimum(0f);
+//        lineChart1.getAxisLeft().setSpaceTop(60f);
+//        lineChart1.getAxisRight().setSpaceTop(60f);
+//        lineChart1.getAxisRight().setDrawLabels(false);
+//        lineChart1.getAxisLeft().setStartAtZero(false);
+//        lineChart1.getAxisLeft().setDrawGridLines(false);
+//        lineChart1.getXAxis().setDrawGridLines(false);
+//        lineChart1.getXAxis().setDrawAxisLine(false);
+//        lineChart1.setHorizontalScrollBarEnabled(true);
+//        lineChart1.getDescription().setEnabled(false);
+//        lineChart1.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart1.setScaleXEnabled(true);
+//        lineChart1.fitScreen();
+//        lineChart1.setData(lineData1);
+//    }
+//
+//    private void creatSecondGraphView() {
+//        lineChart2.setHardwareAccelerationEnabled(true);
+//        dataPoints2 = new ArrayList<>();
+//        dataPoints2.add(new Entry(0, 0));
+//        lineDataSet2 = new LineDataSet(dataPoints2, "Emg Graph");
+//        lineDataSet2.setDrawCircles(false);
+//        lineDataSet2.setValueTextSize(0);
+//        lineDataSet2.setDrawValues(false);
+//        lineDataSet2.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData2 = new LineData(lineDataSet2);
+//        lineChart2.getXAxis();
+//        lineChart2.getXAxis().setAxisMinimum(0f);
+//        lineChart2.getAxisLeft().setSpaceTop(60f);
+//        lineChart2.getAxisRight().setSpaceTop(60f);
+//        lineChart2.getAxisRight().setDrawLabels(false);
+//        lineChart2.getAxisLeft().setStartAtZero(false);
+//        lineChart2.getAxisLeft().setDrawGridLines(false);
+//        lineChart2.getXAxis().setDrawGridLines(false);
+//        lineChart2.getXAxis().setDrawAxisLine(false);
+//        lineChart2.setHorizontalScrollBarEnabled(true);
+//        lineChart2.getDescription().setEnabled(false);
+//        lineChart2.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart2.setScaleXEnabled(true);
+//        lineChart2.fitScreen();
+//        lineChart2.setData(lineData2);
+//    }
+//
+//    private void creatThirdGraphView() {
+//        lineChart3.setHardwareAccelerationEnabled(true);
+//        dataPoints3 = new ArrayList<>();
+//        dataPoints3.add(new Entry(0, 0));
+//        lineDataSet3 = new LineDataSet(dataPoints3, "Emg Graph");
+//        lineDataSet3.setDrawCircles(false);
+//        lineDataSet3.setValueTextSize(0);
+//        lineDataSet3.setDrawValues(false);
+//        lineDataSet3.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData3 = new LineData(lineDataSet3);
+//        lineChart3.getXAxis();
+//        lineChart3.getXAxis().setAxisMinimum(0f);
+//        lineChart3.getAxisLeft().setSpaceTop(60f);
+//        lineChart3.getAxisRight().setSpaceTop(60f);
+//        lineChart3.getAxisRight().setDrawLabels(false);
+//        lineChart3.getAxisLeft().setStartAtZero(false);
+//        lineChart3.getAxisLeft().setDrawGridLines(false);
+//        lineChart3.getXAxis().setDrawGridLines(false);
+//        lineChart3.getXAxis().setDrawAxisLine(false);
+//        lineChart3.setHorizontalScrollBarEnabled(true);
+//        lineChart3.getDescription().setEnabled(false);
+//        lineChart3.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart3.setScaleXEnabled(true);
+//        lineChart3.fitScreen();
+//        lineChart3.setData(lineData3);
+//    }
+//
+//    private void creatFourthGraphView() {
+//        lineChart4.setHardwareAccelerationEnabled(true);
+//        dataPoints4 = new ArrayList<>();
+//        dataPoints4.add(new Entry(0, 0));
+//        lineDataSet4 = new LineDataSet(dataPoints4, "Emg Graph");
+//        lineDataSet4.setDrawCircles(false);
+//        lineDataSet4.setValueTextSize(0);
+//        lineDataSet4.setDrawValues(false);
+//        lineDataSet4.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData4 = new LineData(lineDataSet4);
+//        lineChart4.getXAxis();
+//        lineChart4.getXAxis().setAxisMinimum(0f);
+//        lineChart4.getAxisLeft().setSpaceTop(60f);
+//        lineChart4.getAxisRight().setSpaceTop(60f);
+//        lineChart4.getAxisRight().setDrawLabels(false);
+//        lineChart4.getAxisLeft().setStartAtZero(false);
+//        lineChart4.getAxisLeft().setDrawGridLines(false);
+//        lineChart4.getXAxis().setDrawGridLines(false);
+//        lineChart4.getXAxis().setDrawAxisLine(false);
+//        lineChart4.setHorizontalScrollBarEnabled(true);
+//        lineChart4.getDescription().setEnabled(false);
+//        lineChart4.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart4.setScaleXEnabled(true);
+//        lineChart4.fitScreen();
+//        lineChart4.setData(lineData4);
+//    }
+//
+//    private void creatFifthGraphView() {
+//        lineChart5.setHardwareAccelerationEnabled(true);
+//        dataPoints5 = new ArrayList<>();
+//        dataPoints5.add(new Entry(0, 0));
+//        lineDataSet5 = new LineDataSet(dataPoints5, "Emg Graph");
+//        lineDataSet5.setDrawCircles(false);
+//        lineDataSet5.setValueTextSize(0);
+//        lineDataSet5.setDrawValues(false);
+//        lineDataSet5.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData5 = new LineData(lineDataSet5);
+//        lineChart5.getXAxis();
+//        lineChart5.getXAxis().setAxisMinimum(0f);
+//        lineChart5.getAxisLeft().setSpaceTop(60f);
+//        lineChart5.getAxisRight().setSpaceTop(60f);
+//        lineChart5.getAxisRight().setDrawLabels(false);
+//        lineChart5.getAxisLeft().setStartAtZero(false);
+//        lineChart5.getAxisLeft().setDrawGridLines(false);
+//        lineChart5.getXAxis().setDrawGridLines(false);
+//        lineChart5.getXAxis().setDrawAxisLine(false);
+//        lineChart5.setHorizontalScrollBarEnabled(true);
+//        lineChart5.getDescription().setEnabled(false);
+//        lineChart5.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart5.setScaleXEnabled(true);
+//        lineChart5.fitScreen();
+//        lineChart5.setData(lineData5);
+//    }
+//
+//    private void creatSixthGraphView() {
+//        lineChart6.setHardwareAccelerationEnabled(true);
+//        dataPoints6 = new ArrayList<>();
+//        dataPoints6.add(new Entry(0, 0));
+//        lineDataSet6 = new LineDataSet(dataPoints6, "Emg Graph");
+//        lineDataSet6.setDrawCircles(false);
+//        lineDataSet6.setValueTextSize(0);
+//        lineDataSet6.setDrawValues(false);
+//        lineDataSet6.setColor(getResources().getColor(R.color.pitch_black));
+//        lineData6 = new LineData(lineDataSet6);
+//        lineChart6.getXAxis();
+//        lineChart6.getXAxis().setAxisMinimum(0f);
+//        lineChart6.getAxisLeft().setSpaceTop(60f);
+//        lineChart6.getAxisRight().setSpaceTop(60f);
+//        lineChart6.getAxisRight().setDrawLabels(false);
+//        lineChart6.getAxisLeft().setStartAtZero(false);
+//        lineChart6.getAxisLeft().setDrawGridLines(false);
+//        lineChart6.getXAxis().setDrawGridLines(false);
+//        lineChart6.getXAxis().setDrawAxisLine(false);
+//        lineChart6.setHorizontalScrollBarEnabled(true);
+//        lineChart6.getDescription().setEnabled(false);
+//        lineChart6.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//        lineChart6.setScaleXEnabled(true);
+//        lineChart6.fitScreen();
+//        lineChart6.setData(lineData6);
+//    }
+//
+//
+//
+//    public void updateFirstChart(int value){
+//        ++num_of_entries1;
+//        lineData1.addEntry(new Entry((float) num_of_entries1 / 50, value), 0);
+//        lineChart1.notifyDataSetChanged();
+//        lineChart1.invalidate();
+//        lineChart1.getXAxis();
+//        lineChart1.getAxisLeft();
+//        lineChart1.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart1.setVisibleXRangeMaximum(5f);
+//        lineChart1.moveViewToX((float) num_of_entries1 / 50);
+//    }
+//
+//    public void updateSecondChart(int value){
+//        ++num_of_entries2;
+//        lineData2.addEntry(new Entry((float) num_of_entries2 / 50, value), 0);
+//        lineChart2.notifyDataSetChanged();
+//        lineChart2.invalidate();
+//        lineChart2.getXAxis();
+//        lineChart2.getAxisLeft();
+//        lineChart2.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart2.setVisibleXRangeMaximum(5f);
+//        lineChart2.moveViewToX((float) num_of_entries2 / 50);
+//    }
+//
+//    public void updateThirdChart(int value){
+//        ++num_of_entries3;
+//        lineData3.addEntry(new Entry((float) num_of_entries3 / 50, value), 0);
+//        lineChart3.notifyDataSetChanged();
+//        lineChart3.invalidate();
+//        lineChart3.getXAxis();
+//        lineChart3.getAxisLeft();
+//        lineChart3.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart3.setVisibleXRangeMaximum(5f);
+//        lineChart3.moveViewToX((float) num_of_entries3 / 50);
+//    }
+//
+//    public void updateFourthChart(int value){
+//        ++num_of_entries4;
+//        lineData4.addEntry(new Entry((float) num_of_entries4 / 50, value), 0);
+//        lineChart4.notifyDataSetChanged();
+//        lineChart4.invalidate();
+//        lineChart4.getXAxis();
+//        lineChart4.getAxisLeft();
+//        lineChart4.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart4.setVisibleXRangeMaximum(5f);
+//        lineChart4.moveViewToX((float) num_of_entries4 / 50);
+//    }
+//
+//    public void updateFifthChart(int value){
+//        ++num_of_entries5;
+//        lineData5.addEntry(new Entry((float) num_of_entries5 / 50, value), 0);
+//        lineChart5.notifyDataSetChanged();
+//        lineChart5.invalidate();
+//        lineChart5.getXAxis();
+//        lineChart5.getAxisLeft();
+//        lineChart5.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart5.setVisibleXRangeMaximum(5f);
+//        lineChart5.moveViewToX((float) num_of_entries5 / 50);
+//    }
+//
+//    public void updateSixthChart(int value){
+//        ++num_of_entries6;
+//        lineData6.addEntry(new Entry((float) num_of_entries6 / 50, value), 0);
+//        lineChart6.notifyDataSetChanged();
+//        lineChart6.invalidate();
+//        lineChart6.getXAxis();
+//        lineChart6.getAxisLeft();
+//        lineChart6.getAxisLeft().setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return (int) value + getResources().getString(R.string.emg_unit);
+//            }
+//        });
+//        if (UpdateTime1 / 1000 > 3)
+//            lineChart6.setVisibleXRangeMaximum(5f);
+//        lineChart6.moveViewToX((float) num_of_entries6 / 50);
+//    }
 
 
 
@@ -884,28 +960,28 @@ public class HomeFragment extends Fragment {
 
             else if(action.equalsIgnoreCase(session_data_1)){
                 int emg = intent.getIntExtra(session_data_1,0);
-                homeViewModel.getEmg1().setValue(emg);
-                updateFirstChart(emg);
+//                homeViewModel.getEmg1().setValue(emg);
+//                updateFirstChart(emg);
             } else if(action.equalsIgnoreCase(session_data_2)){
                 int emg = intent.getIntExtra(session_data_2,0);
-                homeViewModel.getEmg2().setValue(emg);
-                updateSecondChart(emg);
+//                homeViewModel.getEmg2().setValue(emg);
+//                updateSecondChart(emg);
             }else if(action.equalsIgnoreCase(session_data_3)){
                 int emg = intent.getIntExtra(session_data_3,0);
-                homeViewModel.getEmg3().setValue(emg);
-                updateThirdChart(emg);
+//                homeViewModel.getEmg3().setValue(emg);
+//                updateThirdChart(emg);
             } else if(action.equalsIgnoreCase(session_data_4)){
                 int emg = intent.getIntExtra(session_data_4,0);
-                homeViewModel.getEmg4().setValue(emg);
-                updateFourthChart(emg);
+//                homeViewModel.getEmg4().setValue(emg);
+//                updateFourthChart(emg);
             }else if(action.equalsIgnoreCase(session_data_5)){
                 int emg = intent.getIntExtra(session_data_5,0);
-                homeViewModel.getEmg5().setValue(emg);
-                updateFifthChart(emg);
+//                homeViewModel.getEmg5().setValue(emg);
+//                updateFifthChart(emg);
             } else if(action.equalsIgnoreCase(session_data_6)){
                 int emg = intent.getIntExtra(session_data_6,0);
-                homeViewModel.getEmg6().setValue(emg);
-                updateSixthChart(emg);
+//                homeViewModel.getEmg6().setValue(emg);
+//                updateSixthChart(emg);
             }
 
             else if(action.equalsIgnoreCase(bluetooth_state)){

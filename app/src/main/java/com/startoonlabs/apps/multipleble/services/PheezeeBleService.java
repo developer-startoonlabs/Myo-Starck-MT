@@ -1,5 +1,6 @@
 package com.startoonlabs.apps.multipleble.services;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -39,6 +40,7 @@ import com.startoonlabs.apps.multipleble.classes.DeviceListClass;
 import com.startoonlabs.apps.multipleble.model.PheezeeDevicesGattListModel;
 import com.startoonlabs.apps.multipleble.model.PheezeeServicesListModel;
 import com.startoonlabs.apps.multipleble.utils.ByteToArrayOperations;
+import com.startoonlabs.apps.multipleble.utils.ValueBasedColorOperations;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -219,6 +221,7 @@ public class PheezeeBleService extends Service {
         return START_NOT_STICKY;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -303,6 +306,7 @@ public class PheezeeBleService extends Service {
     }
 
 
+    @SuppressLint("MissingPermission")
     private void startScan() {
         List<ScanFilter> filters = new ArrayList<>();
         ScanSettings settings = new ScanSettings.Builder()
@@ -547,6 +551,7 @@ public class PheezeeBleService extends Service {
 
 
 
+    @SuppressLint("MissingPermission")
     public void stopScan(){
         if (mScanning && bluetoothAdapter != null && bluetoothAdapter.isEnabled() && mBluetoothLeScanner != null) {
             mBluetoothLeScanner.stopScan(mScanCallback);
@@ -597,6 +602,19 @@ public class PheezeeBleService extends Service {
 //        writeCharacteristic(mCustomCharacteristic, ValueBasedColorOperations.getParticularDataToPheeze(body_orientation, muscle_position, exercise_position, bodypart_position),"AE");
 //    }
 
+    public void sendBodypartDataToDevice(String bodypart, int body_orientation, String patientName, int exercise_position,
+                                         int muscle_position, int bodypart_position, int orientation_position){
+        String session_performing_notif = "Device Connected, Session is going on ";
+        showNotification(session_performing_notif +patientName);
+
+        // When Abdomen is selected, extension is removed and current implementation checks the exercise position.
+        // TODO: Improve the passing of exercise information using strings are similar to that of bodypart selected.
+        if(bodypart_position==13 && exercise_position>=2) exercise_position=exercise_position+1;
+
+        writeCharacteristic(mCustomCharacteristic, ValueBasedColorOperations.getParticularDataToPheeze(01, 01, 01, 01, 01),"AE");
+    }
+
+    @SuppressLint("MissingPermission")
     public void disableNotificationOfSession(){
         showNotification(device_connected_notif+"("+num_of_device_connected+")");
         if(bluetoothGatt!=null && mCustomCharacteristicDescriptor!=null && mCustomCharacteristic!=null){
@@ -621,6 +639,7 @@ public class PheezeeBleService extends Service {
             final BluetoothDevice remoteDevice = bluetoothAdapter.getRemoteDevice(deviceMacc);
             this.remoteDevice = remoteDevice;
             new Handler(getMainLooper()).post(new Runnable() {
+                @SuppressLint("MissingPermission")
                 @Override
                 public void run() {
                     bluetoothGatt = remoteDevice.connectGatt(getApplicationContext(), false, callback);
@@ -641,6 +660,7 @@ public class PheezeeBleService extends Service {
             });
     }
 
+    @SuppressLint("MissingPermission")
     public void disconnectDevice() {
         if(bluetoothGatt==null){
             return;
@@ -680,7 +700,7 @@ public class PheezeeBleService extends Service {
             String setDeviceBondState;
             BluetoothDevice device = result.getDevice();
             String deviceAddress = device.getAddress();
-            String deviceName = device.getName();
+            @SuppressLint("MissingPermission") String deviceName = device.getName();
 
             if(deviceName==null)
                 deviceName = "UNKNOWN DEVICE";
@@ -689,7 +709,7 @@ public class PheezeeBleService extends Service {
                     SystemClock.elapsedRealtime() +
                     (result.getTimestampNanos() / 1000000);
             int deviceRssi = result.getRssi();
-            int deviceBondState = device.getBondState();
+            @SuppressLint("MissingPermission") int deviceBondState = device.getBondState();
             //Just to update the bondstate if needed to
             if(deviceBondState == 0)
                 setDeviceBondState = "BONDED";
@@ -781,6 +801,7 @@ public class PheezeeBleService extends Service {
     }
 
 
+    @SuppressLint("MissingPermission")
     public void startFirstDeviceNotification(){
         if(gattList.size()>0){
             if(gattList.get(0).getDeviceStatus()){
@@ -795,6 +816,7 @@ public class PheezeeBleService extends Service {
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void stopFirstDeviceNotification(){
         if(gattList.size()>0){
             if(gattList.get(0).getDeviceStatus()){
@@ -809,6 +831,7 @@ public class PheezeeBleService extends Service {
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void startSecondDeviceNotification(){
         if(gattList.size()>1){
             if(gattList.get(1).getDeviceStatus()){
@@ -823,6 +846,7 @@ public class PheezeeBleService extends Service {
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void stopSecondDeviceNotification(){
         if(gattList.size()>1){
             if(gattList.get(1).getDeviceStatus()){
@@ -838,6 +862,7 @@ public class PheezeeBleService extends Service {
     }
 
 
+    @SuppressLint("MissingPermission")
     public void startAllNotification(){
         if(gattList.size()==0){
             Toast.makeText(this, "No Device Connected", Toast.LENGTH_SHORT).show();
@@ -856,6 +881,7 @@ public class PheezeeBleService extends Service {
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void stopAlNotification(){
         if(gattList.size()==0){
             Toast.makeText(this, "No Device Connected", Toast.LENGTH_SHORT).show();
@@ -877,6 +903,7 @@ public class PheezeeBleService extends Service {
 
 
     public BluetoothGattCallback callback = new BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Log.i("STATE",status+","+newState);
@@ -1015,7 +1042,7 @@ public class PheezeeBleService extends Service {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.i("here","here");
+            Log.i("Kranthi_Testing","here");
             byte[] temp_byte;
             int value = 0;
             temp_byte = characteristic.getValue();
@@ -1050,15 +1077,6 @@ public class PheezeeBleService extends Service {
                     }
             }
 
-//            if(gattList.size()>=2){
-//                if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
-//                    sendSessionDataBroadcastForFirstDevice(value);
-//                }else {
-//                    sendSessionDataBroadcastForSecondDevice(value);
-//                }
-//            }else {
-//                sendSessionDataBroadcastForFirstDevice(value);
-//            }
         }
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -1082,6 +1100,7 @@ public class PheezeeBleService extends Service {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void writeCharacteristic(BluetoothGattCharacteristic characteristic, byte[] b, String value) {
         if(bluetoothGatt!=null && characteristic!=null) {
             characteristic.setValue(b);
@@ -1205,6 +1224,7 @@ public class PheezeeBleService extends Service {
         return remoteDevice.getAddress();
     }
 
+    @SuppressLint("MissingPermission")
     public String getDeviceName(){
         return remoteDevice.getName();
     }

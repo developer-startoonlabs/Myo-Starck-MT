@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:elevation="@dimen/toolbar_dim_5"
+        android:elevation="@dimen/toolbar_dim_5"
+        android:background="@color/white_opaque"
+        tools:ignore="UnusedAttribute">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/ll_toolbar"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4"
+                tools:ignore="UseCompoundDrawables">
+                <TextView
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Live Monitor"
+                    android:textSize="20sp"
+                    android:textColor="@color/good_green"/>
+            </LinearLayout>
+
+
+
+
+
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp">
+                <LinearLayout
+                    android:id="@+id/add_device_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="8sp"
+                    android:layout_marginBottom="8sp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+                    <!--                android:background="@color/dirtyWhite">-->
+                    <!--                @drawable/my_device_background-->
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/iv_device_2"
+                        android:src="@drawable/ic_device"
+                        android:layout_gravity="start|center"
+                        android:contentDescription="@string/cd_device_disconnected" />
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:visibility="gone"
+
+                        android:layout_height="50dp"
+                        android:id="@+id/iv_device_disconnected_2"
+                        android:src="@drawable/device_disconnected_icon"
+                        android:layout_gravity="start|center"
+                        android:contentDescription="@string/cd_device_disconnected" />
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/iv_device_connected_2"
+
+                        android:src="@drawable/ic_device_connected"
+                        android:visibility="gone"
+                        android:layout_gravity="start|center"
+                        android:contentDescription="@string/cd_device_connected" />
+
+
+                </LinearLayout>
+            </FrameLayout>
+
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent">
+
+                <LinearLayout
+                    android:layout_weight="0"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content">
+                    <TextView
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="25dp"
+                        android:layout_marginRight="25dp"
+                        android:textAlignment="center"
+                        android:text="Muscle Activity"
+                        android:textColor="@color/good_green"
+                        android:textSize="25dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_weight="0"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <LinearLayout android:orientation="vertical"
+                        android:layout_height="fill_parent"
+                        android:layout_width="fill_parent">
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:id="@+id/tv_max_emg_show_one"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0UV"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="20sp" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:gravity="center"
+                            android:layout_weight="0"
+                            android:layout_height="250dp"
+                            android:layout_width="match_parent">
+
+                            <ProgressBar
+                                android:id="@+id/progress_bar_one"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:progress="1"
+                                android:max="1900"
+                                android:progressDrawable="@drawable/verticalprogressbar"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:id="@+id/tv_mac_first"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="---------------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:id="@+id/tv_device_status_1"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="------------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Max EMG:"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                            <TextView
+                                android:id="@+id/max_emg_one"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent">
+
+                <LinearLayout
+                    android:layout_weight="0"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content">
+                    <TextView
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="25dp"
+                        android:layout_marginRight="25dp"
+                        android:textAlignment="center"
+                        android:text="Muscle Activity"
+                        android:textColor="@color/good_green"
+                        android:textSize="25dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_weight="0"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <LinearLayout android:orientation="vertical"
+                        android:layout_height="fill_parent"
+                        android:layout_width="fill_parent">
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:id="@+id/tv_max_emg_show_two"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0UV"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="20sp" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:gravity="center"
+                            android:layout_weight="0"
+                            android:layout_height="250dp"
+                            android:layout_width="match_parent">
+
+                            <ProgressBar
+                                android:id="@+id/progress_bar_two"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:progress="1"
+                                android:max="1900"
+                                android:progressDrawable="@drawable/verticalprogressbar"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:id="@+id/tv_mac_second"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="---------------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+
+                            <TextView
+                                android:id="@+id/tv_device_status_2"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="------------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="0"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent">
+                            <TextView
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Max EMG:"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                            <TextView
+                                android:id="@+id/max_emg_two"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-------------"
+                                android:textAlignment="center"
+                                android:textColor="@color/pitch_black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_stop_device1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_stop_button"
+            android:textAllCaps="false"
+            android:text="Cancel"
+            android:visibility="visible"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"/>
+
+        <Button
+            android:id="@+id/btn_start_device1"
+            android:background="@drawable/rounded_start_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
