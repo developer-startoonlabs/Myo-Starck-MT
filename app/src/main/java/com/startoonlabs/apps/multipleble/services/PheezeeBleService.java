@@ -64,6 +64,7 @@ public class PheezeeBleService extends Service {
     private final String device_charging = "Device Connected, charging";
     private boolean first_packet = true;
     Message mMessage = new Message();
+    Message mMessagetwo = new Message();
 
     boolean isConnectCommandGiven = false;
     //Intent Actions
@@ -543,6 +544,10 @@ public class PheezeeBleService extends Service {
 
     public Message getSessionData(){
         return mMessage;
+    }
+
+    public Message getSessionDataTwo(){
+        return mMessagetwo;
     }
 
     public ArrayList<DeviceListClass> getScannedList(){
@@ -1038,44 +1043,101 @@ public class PheezeeBleService extends Service {
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             Log.i("Descriptor Written","ABCASDASD");
+            sendBodypartDataToDevice("0", 01, "0", 01, 01, 01, 01);
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.i("Kranthi_Testing","here");
-            byte[] temp_byte;
-            int value = 0;
-            temp_byte = characteristic.getValue();
-            byte header_main = temp_byte[0];
-            //session related
-            if (ByteToArrayOperations.byteToStringHexadecimal(header_main).equals("A1"))  {
-                    value = ByteToArrayOperations.getAngleFromData(temp_byte[1],temp_byte[2]);
-                    if(gattList.size()>0){
-                        if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForFirstDevice(value);
-                        }
-                    }if(gattList.size()>1){
-                        if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForSecondDevice(value);
-                        }
-                    }if(gattList.size()>2){
-                        if(gatt.getDevice()==gattList.get(2).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForThirdDevice(value);
-                        }
-                    }if(gattList.size()>3){
-                        if(gatt.getDevice()==gattList.get(3).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForFourthDevice(value);
-                        }
-                    }if(gattList.size()>4){
-                        if(gatt.getDevice()==gattList.get(4).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForFifthDevice(value);
-                        }
-                    }if(gattList.size()>5){
-                        if(gatt.getDevice()==gattList.get(5).getmBluetoothGatt().getDevice()){
-                            sendSessionDataBroadcastForSixthDevice(value);
+            if(gattList.size()>0){
+                if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
+                    byte[] temp_byte;
+                    int value = 0;
+                    temp_byte = characteristic.getValue();
+                    byte header_main = temp_byte[0];
+                    byte header_sub = temp_byte[1];
+                    int sub_byte_size = temp_byte.length-2;
+                    byte[] sub_byte = new byte[sub_byte_size];
+                    if (ByteToArrayOperations.byteToStringHexadecimal(header_main).equals("AA")) {
+                        if (ByteToArrayOperations.byteToStringHexadecimal(header_sub).equals("01")) {
+                            int j = 2;
+                            for (int i = 0; i < sub_byte_size; i++, j++) {
+                                sub_byte[i] = temp_byte[j];
+                            }
+                            mMessage = Message.obtain();
+                            mMessage.obj = sub_byte;
+                            boolean sessionCompleted = false;
+                            if (!sessionCompleted && !first_packet) {
+                                sendSessionDataBroadcastForFirstDevice();
+                            } else {
+                                first_packet = false;
+                            }
                         }
                     }
+                }
+            }if(gattList.size()>1){
+                if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()){
+                    byte[] temp_byte;
+                    int value = 0;
+                    temp_byte = characteristic.getValue();
+                    byte header_main = temp_byte[0];
+                    byte header_sub = temp_byte[1];
+                    int sub_byte_size = temp_byte.length-2;
+                    byte[] sub_byte = new byte[sub_byte_size];
+                    if (ByteToArrayOperations.byteToStringHexadecimal(header_main).equals("AA")) {
+                        if (ByteToArrayOperations.byteToStringHexadecimal(header_sub).equals("01")) {
+                            int j = 2;
+                            for (int i = 0; i < sub_byte_size; i++, j++) {
+                                sub_byte[i] = temp_byte[j];
+                            }
+                            mMessagetwo = Message.obtain();
+                            mMessagetwo.obj = sub_byte;
+                            boolean sessionCompleted = false;
+                            if (!sessionCompleted && !first_packet) {
+                                sendSessionDataBroadcastForSecondDevice();
+                            } else {
+                                first_packet = false;
+                            }
+                        }
+                    }
+
+                }
             }
+
+
+//            if(getSessionData()!=null) {
+//                Message message = new Message();
+//                message.obj = getSessionData().obj;
+//                Log.i("Kranthi_Testing", String.valueOf(message.obj));
+//            }
+            //session related
+//            if (ByteToArrayOperations.byteToStringHexadecimal(header_main).equals("A1"))  {
+//                    value = ByteToArrayOperations.getAngleFromData(temp_byte[1],temp_byte[2]);
+//                    if(gattList.size()>0){
+//                        if(gatt.getDevice()==gattList.get(0).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForFirstDevice();
+//                        }
+//                    }if(gattList.size()>1){
+//                        if(gatt.getDevice()==gattList.get(1).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForSecondDevice();
+//                        }
+//                    }if(gattList.size()>2){
+//                        if(gatt.getDevice()==gattList.get(2).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForThirdDevice(value);
+//                        }
+//                    }if(gattList.size()>3){
+//                        if(gatt.getDevice()==gattList.get(3).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForFourthDevice(value);
+//                        }
+//                    }if(gattList.size()>4){
+//                        if(gatt.getDevice()==gattList.get(4).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForFifthDevice(value);
+//                        }
+//                    }if(gattList.size()>5){
+//                        if(gatt.getDevice()==gattList.get(5).getmBluetoothGatt().getDevice()){
+//                            sendSessionDataBroadcastForSixthDevice(value);
+//                        }
+//                    }
+//            }
 
         }
         @Override
@@ -1109,15 +1171,15 @@ public class PheezeeBleService extends Service {
     }
 
 
-    private void sendSessionDataBroadcastForFirstDevice(int value){
+    private void sendSessionDataBroadcastForFirstDevice(){
         Intent i = new Intent(session_data_1);
-        i.putExtra(session_data_1,value);
+        i.putExtra(session_data_1,"");
         sendBroadcast(i);
     }
 
-    private void sendSessionDataBroadcastForSecondDevice(int value){
+    private void sendSessionDataBroadcastForSecondDevice(){
         Intent i = new Intent(session_data_2);
-        i.putExtra(session_data_2,value);
+        i.putExtra(session_data_2,"");
         sendBroadcast(i);
     }
 

@@ -406,7 +406,7 @@
             android:background="@drawable/rounded_stop_button"
             android:textAllCaps="false"
             android:text="Cancel"
-            android:visibility="visible"
+            android:visibility="gone"
             android:textColor="#FFFFFF"
             android:textSize="18sp"/>
 

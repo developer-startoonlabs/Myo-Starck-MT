@@ -79,6 +79,9 @@ import static com.startoonlabs.apps.multipleble.services.PheezeeBleService.sessi
 public class HomeFragment extends Fragment {
     private static final int REQUEST_FINE_LOCATION = 14;
     boolean isBound = false;
+    private  int maxEmgValue = 0;
+
+    private int maxEmgValueTwo = 0;
     PheezeeBleService mCustomService;
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 200;
@@ -99,7 +102,7 @@ public class HomeFragment extends Fragment {
 
 
 
-    Button btn_start_first;
+    Button btn_start_first, btn_stop_device1;
     int num_of_entries1 = 0, num_of_entries2 = 0, num_of_entries3 = 0, num_of_entries4 = 0, num_of_entries5 = 0, num_of_entries6 = 0;
 
     long MillisecondTime1, StartTime1, TimeBuff1, UpdateTime1 = 0L;
@@ -141,6 +144,7 @@ public class HomeFragment extends Fragment {
         tv_mac_second = root.findViewById(R.id.tv_mac_second);
 
         btn_start_first = root.findViewById(R.id.btn_start_device1);
+        btn_stop_device1 = root.findViewById(R.id.btn_stop_device1);
         handler1 = new Handler();
         handler2 = new Handler();
 
@@ -223,40 +227,18 @@ public class HomeFragment extends Fragment {
         });
 
         btn_start_first.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
-//                startSessions();
+                startSessions();
                 if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
-
-//                    if(getSessionData()!=null) {
-//
-//                        Message message = new Message();
-//                        message.obj = getSessionData().obj;
-//                        myHandler.sendMessage(message);
-//                    }
-
-//                        mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
-//                                01, 01, 01);
-//                        Toast.makeText(getActivity(),"kranthi",Toast.LENGTH_SHORT).show();
                         num_of_entries1=0;num_of_entries2=0;num_of_entries3=0;num_of_entries4 = 0;num_of_entries5=0;num_of_entries6=0;
-                        btn_start_first.setText("STOP");
+                        btn_start_first.setVisibility(View.GONE);
+                        btn_stop_device1.setVisibility(View.VISIBLE);
                         if (mCustomService != null) {
                             mCustomService.startAllNotification();
                         }
                         handler1.postDelayed(runnable1, 0);
-                    } else {
-                        btn_start_first.setText("START");
-                        if (mCustomService != null) {
-                            mCustomService.stopAlNotification();
-                        }
-                        TimeBuff1 += MillisecondTime1;
-                        handler1.removeCallbacks(runnable1);
-                        MillisecondTime1 = 0L;
-                        StartTime1 = 0L;
-                        num_of_entries1=0;
-                        TimeBuff1 = 0L;
-                        UpdateTime1 = 0L;
-                        tsLong1 = System.currentTimeMillis();
                     }
 
             }
@@ -265,42 +247,32 @@ public class HomeFragment extends Fragment {
 
         });
 
+        btn_stop_device1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btn_start_first.setVisibility(View.VISIBLE);
+                btn_stop_device1.setVisibility(View.GONE);
+                if (mCustomService != null) {
+                    mCustomService.stopAlNotification();
+                }
+                TimeBuff1 += MillisecondTime1;
+                handler1.removeCallbacks(runnable1);
+                MillisecondTime1 = 0L;
+                StartTime1 = 0L;
+                num_of_entries1=0;
+                TimeBuff1 = 0L;
+                UpdateTime1 = 0L;
+                tsLong1 = System.currentTimeMillis();
+            }
+        });
 
 
 
 
 
 
-//        btn_start_first.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                    if (btn_start_first.getText().toString().equalsIgnoreCase("start")) {
-//                        mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
-//                                01, 01, 01);
-////                        Toast.makeText(getActivity(),"kranthi",Toast.LENGTH_SHORT).show();
-//                        num_of_entries1=0;num_of_entries2=0;num_of_entries3=0;num_of_entries4 = 0;num_of_entries5=0;num_of_entries6=0;
-//                        btn_start_first.setText("STOP");
-//                        if (mCustomService != null) {
-//                            mCustomService.startAllNotification();
-//                        }
-//                        handler1.postDelayed(runnable1, 0);
-//                    } else {
-//                        btn_start_first.setText("START");
-//                        if (mCustomService != null) {
-//                            mCustomService.stopAlNotification();
-//                        }
-//                        TimeBuff1 += MillisecondTime1;
-//                        handler1.removeCallbacks(runnable1);
-//                        MillisecondTime1 = 0L;
-//                        StartTime1 = 0L;
-//                        num_of_entries1=0;
-//                        TimeBuff1 = 0L;
-//                        UpdateTime1 = 0L;
-//                        tsLong1 = System.currentTimeMillis();
-//                    }
-//
-//            }
-//        });
+
+
 
 
 
@@ -334,63 +306,44 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-//    private void startSessions() {
-//
-//        mSessionStarted = true;
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
-//                        01, 01, 01);
-//            }
-//        }, 100);
-////                if(getSessionData()!=null) {
-////                    Message message = new Message();
-////                    message.obj = getSessionData().obj;
-////                    myHandler.sendMessage(message);
-////                }
-//
-////        EmgReciver();
-//
-//
-//    }
 
 
-////    private void EmgReciver() {
-////
-////        IntentFilter intentFilter = new IntentFilter();
-////        intentFilter.addAction(session_data_1);
-////        getActivity().registerReceiver(session_data_receiver,intentFilter);
-////    }
-//
-//    BroadcastReceiver session_data_receiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//
-//            String action = intent.getAction();
-//
-//
-//            if(action.equalsIgnoreCase(session_data)){
-//
-////                if(getSessionData()!=null) {
-////                    Message message = new Message();
-////                    message.obj = getSessionData().obj;
-////                    myHandler.sendMessage(message);
-////                }
-//            }
-//        }
-//    };
-//
-//    public Message getSessionData(){
-//        if(mCustomService!=null) {
-//            Message msg = mCustomService.getSessionData();
-//            return msg;
-//        }
-//        return null;
-//    }
-//
-//    @SuppressLint("HandlerLeak")
+    private void startSessions() {
+
+        mSessionStarted = true;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                mCustomService.sendBodypartDataToDevice("0", 01, "0", 01,
+                        01, 01, 01);
+            }
+        }, 100);
+
+    }
+
+
+
+
+    public Message getSessionData(){
+        if(mCustomService!=null) {
+            Message msg = mCustomService.getSessionData();
+            return msg;
+        }
+        return null;
+    }
+
+    public Message getSessionDataTwo(){
+        if(mCustomService!=null) {
+            Message msg = mCustomService.getSessionDataTwo();
+            return msg;
+        }
+        return null;
+    }
+
+
+
+    @SuppressLint("HandlerLeak")
 //    public final Handler myHandler = new Handler() {
 //        public void handleMessage(Message message) {
 //
@@ -407,6 +360,10 @@ public class HomeFragment extends Fragment {
 //                    if (error_device == 0) {
 //                        emg_data = ByteToArrayOperations.getAngleFromData(sub_byte[0], sub_byte[1]);
 //                        Log.e("emg_data_testing", String.valueOf(emg_data));
+//                        progress_bar_one.setProgress(emg_data);
+//                        maxEmgValue = maxEmgValue < emg_data ? emg_data : maxEmgValue;
+//                        max_emg_one.setText(String.valueOf(maxEmgValue)+"μV");
+//                        tv_max_emg_show_one.setText(String.valueOf(emg_data).concat("μV"));
 ////                        tv_max_emg_show.setText(emg_data+"μV");
 ////                        progress_bar.setProgress(emg_data);
 ////                        maxEmgValue = maxEmgValue < emg_data ? emg_data : maxEmgValue;
@@ -486,12 +443,7 @@ public class HomeFragment extends Fragment {
         }
 
 
-//        if(bluetooth_permission_2 != PackageManager.PERMISSION_GRANTED){
-//            listPermissionsNeeded.add(BLUETOOTH_SCAN);
-//        }
-//        if(bluetooth_permission != PackageManager.PERMISSION_GRANTED){
-//            listPermissionsNeeded.add(BLUETOOTH_SCAN);
-//        }
+
 
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(getActivity(), listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
@@ -959,13 +911,32 @@ public class HomeFragment extends Fragment {
 
 
             else if(action.equalsIgnoreCase(session_data_1)){
-                int emg = intent.getIntExtra(session_data_1,0);
-//                homeViewModel.getEmg1().setValue(emg);
-//                updateFirstChart(emg);
+                int emg_data, error_device = 0;
+                byte[] sub_byte;
+                sub_byte = (byte[]) getSessionData().obj;
+                Log.e("Kranthi_status", String.valueOf(sub_byte));
+                emg_data = ByteToArrayOperations.getAngleFromData(sub_byte[0], sub_byte[1]);
+                Log.e("emg_data_testing", String.valueOf(emg_data));
+                progress_bar_one.setProgress(emg_data);
+                maxEmgValue = maxEmgValue < emg_data ? emg_data : maxEmgValue;
+                max_emg_one.setText(String.valueOf(maxEmgValue)+"μV");
+                tv_max_emg_show_one.setText(String.valueOf(emg_data).concat("μV"));
             } else if(action.equalsIgnoreCase(session_data_2)){
-                int emg = intent.getIntExtra(session_data_2,0);
-//                homeViewModel.getEmg2().setValue(emg);
-//                updateSecondChart(emg);
+                int emg_data, error_device = 0;
+                byte[] sub_byte;
+                sub_byte = (byte[]) getSessionDataTwo().obj;
+                Log.e("Kranthi_status", String.valueOf(sub_byte));
+                emg_data = ByteToArrayOperations.getAngleFromData(sub_byte[0], sub_byte[1]);
+                Log.e("emg_data_testing", String.valueOf(emg_data));
+                progress_bar_two.setProgress(emg_data);
+                maxEmgValueTwo = maxEmgValueTwo < emg_data ? emg_data : maxEmgValueTwo;
+                max_emg_two.setText(String.valueOf(maxEmgValueTwo)+"μV");
+                tv_max_emg_show_two.setText(String.valueOf(emg_data).concat("μV"));
+
+//                int emg = intent.getIntExtra(session_data_2,0);
+//                Log.e("Kranthi_testtttttwo", String.valueOf(emg));
+////                homeViewModel.getEmg2().setValue(emg);
+////                updateSecondChart(emg);
             }else if(action.equalsIgnoreCase(session_data_3)){
                 int emg = intent.getIntExtra(session_data_3,0);
 //                homeViewModel.getEmg3().setValue(emg);
